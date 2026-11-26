@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ديواني – الديون والمصاريف</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f766e"><link rel="apple-touch-icon" href="icon-192.png"><title>ديواني – الديون والمصاريف</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--tx:#14213d;--mut:#68748a;--pri:#0f766e;--pri2:#14b8a6;--red:#dc2626;--grn:#16a34a;--bd:#e2e7ef;--in:#eef2f7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -178,5 +178,6 @@ function imp(){try{const o=JSON.parse($('#bk').value);if(!o.cur||!o.base||!Array
 function pwM(){modal(`<h3>تغيير كلمة السر</h3><label>الجديدة<input id="f1" type="password"></label><div class="err" id="er"></div><button class="pri" onclick="chPw()">حفظ</button>`)}
 async function chPw(){const p=$('#f1').value;if(p.length<4)return err('4 أحرف على الأقل');const s=uid();users[U]={s,h:await hash(p,s)};LS.s('dm_users',users);closeM()}
 
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 const s=LS.g('dm_sess','');if(s&&users[s])enter(s);else authUI();
 </script></body></html>
