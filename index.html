@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ديواني – الديون والمصاريف</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f6fa;--card:#fff;--tx:#14213d;--mut:#68748a;--pri:#0f766e;--pri2:#14b8a6;--red:#dc2626;--grn:#16a34a;--bd:#e2e7ef;--in:#eef2f7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1320;--card:#172033;--tx:#e8edf6;--mut:#93a0b8;--bd:#25314a;--in:#0f1727;--pri:#14b8a6;--pri2:#0f766e}}
+:root[data-theme="dark"]{--bg:#0d1320;--card:#172033;--tx:#e8edf6;--mut:#93a0b8;--bd:#25314a;--in:#0f1727;--pri:#14b8a6;--pri2:#0f766e}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+body{font-family:Tajawal,system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:84px;min-height:100vh}
+.w{max-width:640px;margin:auto;padding:14px}
+header{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;border-radius:18px;padding:16px;margin-bottom:12px}
+header small{opacity:.85}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.grid .card{margin:0}
+.big{font-size:22px;font-weight:700;margin:4px 0}
+small,.mut{color:var(--mut);font-size:13px}
+h2{font-size:17px;margin:14px 2px 8px}
+.g{color:var(--grn)}.r{color:var(--red)}
+.tag{font-size:12px;padding:3px 10px;border-radius:99px;font-weight:500}
+.tag.in{background:#16a34a22;color:var(--grn)}.tag.out{background:#dc262622;color:var(--red)}
+.pg{height:7px;background:var(--in);border-radius:9px;margin:8px 0;overflow:hidden}.pg i{display:block;height:100%;background:var(--pri2)}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--in);color:var(--tx);border-radius:10px;padding:8px 12px}
+button.pri{background:var(--pri);color:#fff;border:0;width:100%;padding:12px;font-weight:700;margin-top:10px}
+button.del{color:var(--red)}
+.ok{color:var(--grn);padding:8px 4px}
+input,select,textarea{font:inherit;width:100%;padding:11px;border:1px solid var(--bd);border-radius:10px;background:var(--in);color:var(--tx);margin-top:4px}
+label{display:block;font-size:13px;color:var(--mut);margin-top:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;gap:8px;margin-top:6px}.seg label{flex:1;margin:0;background:var(--in);border:1px solid var(--bd);padding:10px;border-radius:10px;text-align:center;color:var(--tx)}
+.seg input{width:auto;margin-left:6px}
+.chips{display:flex;gap:6px;overflow-x:auto;margin:10px 0}.chips button{white-space:nowrap}.chips .on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.bar{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:14px}.bar span{width:70px;flex:none}.bar div{flex:1;height:10px;background:var(--in);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pri2)}.bar em{font-style:normal;font-size:12px;color:var(--mut);min-width:72px;text-align:left}
+.mc{display:flex;gap:6px;align-items:flex-end;height:90px}.mc div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:11px;color:var(--mut)}.mc p{display:flex;gap:2px;align-items:flex-end;height:70px}.mc b{width:9px;border-radius:3px 3px 0 0;display:block}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav button{flex:1;border:0;background:none;border-radius:0;padding:10px 2px;font-size:12px;color:var(--mut)}nav button.on{color:var(--pri);font-weight:700}nav button span{display:block;font-size:19px}
+.fab{position:fixed;left:16px;bottom:calc(76px + env(safe-area-inset-bottom,0px));width:54px;height:54px;border-radius:50%;background:var(--pri);color:#fff;font-size:28px;border:0;z-index:6;box-shadow:0 6px 16px #0004;padding:0}
+.ov{position:fixed;inset:0;background:#0007;z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sh{background:var(--card);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.sh h3{margin-bottom:4px}
+.auth{max-width:380px;margin:8vh auto;padding:20px}
+.auth h1{text-align:center;font-size:28px;color:var(--pri)}
+.err{color:var(--red);font-size:13px;margin-top:8px;min-height:18px}
+.crt{display:grid;grid-template-columns:1fr 110px auto;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)}
+.crt input{margin:0;padding:8px}
+textarea{min-height:110px;direction:ltr;font-size:12px}
+</style></head><body>
+<div id="app"></div><div id="m"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LS={g(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const CATS=['طعام','مواصلات','سكن','فواتير','صحة','تعليم','ترفيه','تسوق','أخرى'],INC=['راتب','عمل حر','هدية','أخرى'];
+let users=LS.g('dm_users',{}),U=null,D=null,tab='home',am='login',cb=null;
+let fl={debt:'all',q:'',m:new Date().toISOString().slice(0,7),et:'all'};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const today=()=>new Date().toISOString().slice(0,10);
+const save=()=>LS.s('dm_d_'+U,D);
+const def=()=>({base:'USD',debts:[],ex:[],cur:{
+USD:{n:'دولار أمريكي',s:'$',r:1},EUR:{n:'يورو',s:'€',r:1.08},GBP:{n:'جنيه إسترليني',s:'£',r:1.27},SAR:{n:'ريال سعودي',s:'ر.س',r:.2667},AED:{n:'درهم إماراتي',s:'د.إ',r:.2723},JOD:{n:'دينار أردني',s:'د.أ',r:1.41},KWD:{n:'دينار كويتي',s:'د.ك',r:3.25},TRY:{n:'ليرة تركية',s:'₺',r:.029},EGP:{n:'جنيه مصري',s:'ج.م',r:.02}}});
+const conv=(a,c)=>a*((D.cur[c]||{r:1}).r);
+const fmt=(a,c)=>Number(a).toLocaleString('en-US',{maximumFractionDigits:2})+' '+(D.cur[c]?D.cur[c].s:c);
+const paid=d=>d.pays.reduce((s,p)=>s+p.a,0),rem=d=>Math.max(0,d.amt-paid(d));
+const co=sel=>Object.keys(D.cur).map(k=>`<option value="${k}" ${k==sel?'selected':''}>${k} · ${esc(D.cur[k].n)}</option>`).join('');
+const hash=async(p,s)=>{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')};
+const modal=h=>{$('#m').innerHTML=`<div class="ov" onclick="if(event.target==this)closeM()"><div class="sh">${h}</div></div>`};
+const closeM=()=>{$('#m').innerHTML=''};
+const ask=(msg,fn)=>{cb=fn;modal(`<h3>${msg}</h3><button class="pri" onclick="closeM();cb()">تأكيد</button><button style="width:100%;margin-top:8px" onclick="closeM()">إلغاء</button>`)};
+const theme=t=>{if(t)document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme};
+theme(LS.g('dm_theme',''));
+
+/* ---------- حسابات المستخدمين ---------- */
+function authUI(){$('#app').innerHTML=`<div class="auth card"><h1>📒 ديواني</h1><p class="mut" style="text-align:center;margin:6px 0 14px">إدارة الديون والمصاريف بعدة عملات</p>
+<div class="seg"><label onclick="am='login';authUI()" style="${am=='login'?'border-color:var(--pri);color:var(--pri)':''}">دخول</label><label onclick="am='reg';authUI()" style="${am=='reg'?'border-color:var(--pri);color:var(--pri)':''}">حساب جديد</label></div>
+<label>اسم المستخدم<input id="au" autocomplete="username" autocapitalize="none"></label>
+<label>كلمة السر<input id="ap" type="password" autocomplete="${am=='reg'?'new-password':'current-password'}"></label>
+<div class="err" id="er"></div><button class="pri" onclick="auth()">${am=='reg'?'إنشاء الحساب':'دخول'}</button>
+<p class="mut" style="margin-top:12px;font-size:12px">كل حساب له بياناته المنفصلة، وتُحفظ على هذا الجهاز فقط.</p></div>`}
+const err=m=>{$('#er').textContent=m};
+async function auth(){const u=$('#au').value.trim().toLowerCase(),p=$('#ap').value;
+ if(!u||p.length<4)return err('اكتب اسم مستخدم وكلمة سر (4 أحرف على الأقل)');
+ if(am=='reg'){if(users[u])return err('اسم المستخدم محجوز');const s=uid();users[u]={s,h:await hash(p,s)};LS.s('dm_users',users);enter(u)}
+ else{const x=users[u];if(!x||x.h!==await hash(p,x.s))return err('اسم المستخدم أو كلمة السر غلط');enter(u)}}
+function enter(u){U=u;D=LS.g('dm_d_'+u,null)||def();save();LS.s('dm_sess',u);tab='home';shell()}
+const logout=()=>{LS.s('dm_sess','');U=D=null;authUI()};
+
+/* ---------- الهيكل ---------- */
+function shell(){$('#app').innerHTML=`<div class="w"><header><div class="row"><b style="font-size:19px">أهلاً ${esc(U)} 👋</b><small>العملة الأساسية: ${D.base}</small></div></header><div id="v"></div></div>
+<button class="fab" onclick="fab()" aria-label="إضافة">＋</button>
+<nav>${[['home','🏠','الرئيسية'],['debts','🤝','الديون'],['exps','💸','المصاريف'],['curs','💱','العملات'],['sets','⚙️','الإعدادات']].map(x=>`<button data-t="${x[0]}" onclick="tab='${x[0]}';view()"><span>${x[1]}</span>${x[2]}</button>`).join('')}</nav>`;view()}
+function view(){$('.fab').style.display=(tab=='curs'||tab=='sets')?'none':'';$('#v').innerHTML=({home,debts,exps,curs,sets})[tab]();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab));window.scrollTo(0,0)}
+const fab=()=>tab=='exps'?expM():debtM();
+
+/* ---------- الرئيسية ---------- */
+function home(){let inn=0,out=0;const byc={};
+ D.debts.forEach(d=>{const r=rem(d);if(!r)return;const x=conv(r,d.cur);d.dir=='in'?inn+=x:out+=x;byc[d.cur]=byc[d.cur]||{in:0,out:0};byc[d.cur][d.dir]+=r});
+ const m=new Date().toISOString().slice(0,7);let ei=0,eo=0;const cats={};
+ D.ex.filter(e=>e.date.startsWith(m)).forEach(e=>{const x=conv(e.amt,e.cur);if(e.type=='inc')ei+=x;else{eo+=x;cats[e.cat]=(cats[e.cat]||0)+x}});
+ const B=D.base,cl=Object.entries(cats).sort((a,b)=>b[1]-a[1]),mx=cl.length?cl[0][1]:1;
+ const ms=[];for(let i=5;i>=0;i--){const dt=new Date();dt.setDate(1);dt.setMonth(dt.getMonth()-i);ms.push(dt.toISOString().slice(0,7))}
+ const mv=ms.map(k=>{let a=0,b=0;D.ex.filter(e=>e.date.startsWith(k)).forEach(e=>{const x=conv(e.amt,e.cur);e.type=='inc'?a+=x:b+=x});return[k,a,b]});
+ const mm=Math.max(1,...mv.flatMap(x=>[x[1],x[2]]));
+ const up=D.debts.filter(d=>rem(d)>0&&d.due).sort((a,b)=>a.due>b.due?1:-1).slice(0,4);
+ return `<div class="grid"><div class="card"><small>لي عند الناس</small><div class="big g">${fmt(inn,B)}</div></div><div class="card"><small>عليّ للناس</small><div class="big r">${fmt(out,B)}</div></div>
+ <div class="card"><small>صافي الديون</small><div class="big ${inn>=out?'g':'r'}">${fmt(inn-out,B)}</div></div><div class="card"><small>رصيد هذا الشهر</small><div class="big ${ei>=eo?'g':'r'}">${fmt(ei-eo,B)}</div><small>دخل ${fmt(ei,B)}</small></div></div>
+ <div class="card"><b>مصاريف هذا الشهر: ${fmt(eo,B)}</b>${cl.length?cl.map(([k,v])=>`<div class="bar"><span>${k}</span><div><i style="width:${v/mx*100}%"></i></div><em>${fmt(v,B)}</em></div>`).join(''):'<p class="mut" style="margin-top:8px">لا مصاريف بعد</p>'}</div>
+ <div class="card"><b>آخر 6 أشهر</b><div class="mc" style="margin-top:10px">${mv.map(x=>`<div><p><b style="height:${x[1]/mm*100}%;background:var(--grn)"></b><b style="height:${x[2]/mm*100}%;background:var(--red)"></b></p>${x[0].slice(5)}</div>`).join('')}</div><small><span class="g">■</span> دخل &nbsp;<span class="r">■</span> مصروف</small></div>
+ ${Object.keys(byc).length?`<div class="card"><b>الديون حسب العملة</b>${Object.entries(byc).map(([c,v])=>`<div class="row" style="margin-top:8px"><span>${c}</span><span><span class="g">${fmt(v.in,c)}</span> · <span class="r">${fmt(v.out,c)}</span></span></div>`).join('')}</div>`:''}
+ ${up.length?`<h2>أقرب الاستحقاقات</h2>${up.map(d=>`<div class="card row"><div><b>${esc(d.person)}</b><br><small class="${d.due<today()?'r':''}">${d.due}${d.due<today()?' · متأخر':''}</small></div><b class="${d.dir=='in'?'g':'r'}">${fmt(rem(d),d.cur)}</b></div>`).join('')}`:''}`}
+
+/* ---------- الديون ---------- */
+function debts(){const f=fl.debt,q=fl.q.toLowerCase();
+ const L=D.debts.filter(d=>{const r=rem(d);return(f=='all'||(f=='done'?r==0:(r>0&&d.dir==f)))&&(!q||(d.person+' '+d.note).toLowerCase().includes(q))}).sort((a,b)=>(a.due||'9')>(b.due||'9')?1:-1);
+ const ch=[['all','الكل'],['in','لي'],['out','عليّ'],['done','مسددة']];
+ return `<input placeholder="🔍 بحث بالاسم أو الملاحظة" value="${esc(fl.q)}" oninput="fl.q=this.value;dl()"><div class="chips">${ch.map(c=>`<button class="${f==c[0]?'on':''}" onclick="fl.debt='${c[0]}';view()">${c[1]}</button>`).join('')}</div><div id="dl">${dlist(L)}</div>`}
+function dl(){const q=fl.q.toLowerCase(),f=fl.debt;$('#dl').innerHTML=dlist(D.debts.filter(d=>{const r=rem(d);return(f=='all'||(f=='done'?r==0:(r>0&&d.dir==f)))&&(!q||(d.person+' '+d.note).toLowerCase().includes(q))}))}
+function dlist(L){if(!L.length)return '<p class="mut" style="text-align:center;margin:30px">لا توجد ديون. اضغط ＋ للإضافة</p>';
+ return L.map(d=>{const r=rem(d),p=Math.round(paid(d)/d.amt*100),od=r>0&&d.due&&d.due<today();
+ return `<div class="card"><div class="row"><b>${esc(d.person)}</b><span class="tag ${d.dir}">${d.dir=='in'?'لي عنده':'عليّ له'}</span></div>
+ <div class="big">${fmt(r,d.cur)}</div><small>من أصل ${fmt(d.amt,d.cur)}${d.cur!=D.base?' ≈ '+fmt(conv(r,d.cur),D.base):''}</small>
+ <div class="pg"><i style="width:${p}%"></i></div><small>${d.due?'الاستحقاق: '+d.due:''}${od?' <b class="r">متأخر</b>':''}${d.note?' · '+esc(d.note):''}</small>
+ <div class="acts">${r?`<button onclick="payM('${d.id}')">＋ دفعة</button>`:'<span class="ok">مسددة ✓</span>'}<button onclick="hist('${d.id}')">السجل</button><button onclick="debtM('${d.id}')">تعديل</button><button class="del" onclick="delD('${d.id}')">حذف</button></div></div>`}).join('')}
+function debtM(id){const d=id?D.debts.find(x=>x.id==id):{dir:'in',cur:D.base,date:today()};
+ modal(`<h3>${id?'تعديل دين':'دين جديد'}</h3><div class="seg"><label><input type="radio" name="dr" value="in" ${d.dir=='in'?'checked':''}>لي عند شخص</label><label><input type="radio" name="dr" value="out" ${d.dir=='out'?'checked':''}>عليّ لشخص</label></div>
+ <label>الاسم<input id="f1" value="${esc(d.person||'')}" list="pl"></label><datalist id="pl">${[...new Set(D.debts.map(x=>x.person))].map(p=>`<option value="${esc(p)}">`).join('')}</datalist>
+ <div class="two"><label>المبلغ<input id="f2" type="number" inputmode="decimal" step="any" value="${d.amt||''}"></label><label>العملة<select id="f3">${co(d.cur)}</select></label></div>
+ <div class="two"><label>التاريخ<input id="f4" type="date" value="${d.date}"></label><label>الاستحقاق<input id="f5" type="date" value="${d.due||''}"></label></div>
+ <label>ملاحظة<input id="f6" value="${esc(d.note||'')}"></label><div class="err" id="er"></div><button class="pri" onclick="saveD('${id||''}')">حفظ</button>`)}
+function saveD(id){const p=$('#f1').value.trim(),a=parseFloat($('#f2').value);if(!p||!(a>0))return err('اكتب الاسم ومبلغاً صحيحاً');
+ const o={dir:document.querySelector('[name=dr]:checked').value,person:p,amt:a,cur:$('#f3').value,date:$('#f4').value||today(),due:$('#f5').value,note:$('#f6').value.trim()};
+ if(id)Object.assign(D.debts.find(x=>x.id==id),o);else D.debts.push({id:uid(),pays:[],...o});save();closeM();view()}
+function payM(id){const d=D.debts.find(x=>x.id==id);modal(`<h3>دفعة لـ ${esc(d.person)}</h3><small>المتبقي ${fmt(rem(d),d.cur)}</small>
+ <div class="two"><label>المبلغ<input id="f1" type="number" inputmode="decimal" step="any" value="${rem(d)}"></label><label>التاريخ<input id="f2" type="date" value="${today()}"></label></div><div class="err" id="er"></div><button class="pri" onclick="savePay('${id}')">تسجيل الدفعة</button>`)}
+function savePay(id){const d=D.debts.find(x=>x.id==id),a=parseFloat($('#f1').value);if(!(a>0)||a>rem(d)+1e-9)return err('المبلغ غير صحيح أو أكبر من المتبقي');d.pays.push({a,date:$('#f2').value||today()});save();closeM();view()}
+function hist(id){const d=D.debts.find(x=>x.id==id);modal(`<h3>سجل ${esc(d.person)}</h3><p class="mut">الدين الأصلي: ${fmt(d.amt,d.cur)} بتاريخ ${d.date}</p>${d.pays.length?d.pays.map((p,i)=>`<div class="row card" style="margin-top:8px"><span>${p.date} · <b>${fmt(p.a,d.cur)}</b></span><button class="del" onclick="delPay('${id}',${i})">حذف</button></div>`).join(''):'<p class="mut" style="margin-top:10px">لا توجد دفعات</p>'}`)}
+function delPay(id,i){D.debts.find(x=>x.id==id).pays.splice(i,1);save();hist(id);view()}
+const delD=id=>ask('حذف هذا الدين نهائياً؟',()=>{D.debts=D.debts.filter(x=>x.id!=id);save();view()});
+
+/* ---------- المصاريف ---------- */
+function exps(){const L=D.ex.filter(e=>e.date.startsWith(fl.m)&&(fl.et=='all'||e.type==fl.et)).sort((a,b)=>a.date<b.date?1:-1);let i=0,o=0;
+ D.ex.filter(e=>e.date.startsWith(fl.m)).forEach(e=>{const x=conv(e.amt,e.cur);e.type=='inc'?i+=x:o+=x});
+ return `<input type="month" value="${fl.m}" onchange="fl.m=this.value||fl.m;view()"><div class="grid" style="margin-top:10px"><div class="card"><small>الدخل</small><div class="big g">${fmt(i,D.base)}</div></div><div class="card"><small>المصروف</small><div class="big r">${fmt(o,D.base)}</div></div></div>
+ <div class="chips">${[['all','الكل'],['exp','مصاريف'],['inc','دخل']].map(c=>`<button class="${fl.et==c[0]?'on':''}" onclick="fl.et='${c[0]}';view()">${c[1]}</button>`).join('')}</div>
+ ${L.length?L.map(e=>`<div class="card row"><div><b>${e.cat}</b><br><small>${e.date}${e.note?' · '+esc(e.note):''}</small></div><div style="text-align:left"><b class="${e.type=='inc'?'g':'r'}">${e.type=='inc'?'+':'−'}${fmt(e.amt,e.cur)}</b><br><small><a onclick="expM('${e.id}')" style="color:var(--pri)">تعديل</a> · <a onclick="delE('${e.id}')" style="color:var(--red)">حذف</a></small></div></div>`).join(''):'<p class="mut" style="text-align:center;margin:30px">لا توجد حركات في هذا الشهر</p>'}`}
+function expM(id){const e=id?D.ex.find(x=>x.id==id):{type:'exp',cur:D.base,date:today(),cat:'طعام'};
+ modal(`<h3>${id?'تعديل حركة':'حركة جديدة'}</h3><div class="seg"><label><input type="radio" name="et" value="exp" ${e.type=='exp'?'checked':''} onchange="catOpt()">مصروف</label><label><input type="radio" name="et" value="inc" ${e.type=='inc'?'checked':''} onchange="catOpt()">دخل</label></div>
+ <div class="two"><label>المبلغ<input id="f1" type="number" inputmode="decimal" step="any" value="${e.amt||''}"></label><label>العملة<select id="f2">${co(e.cur)}</select></label></div>
+ <div class="two"><label>التصنيف<select id="f3"></select></label><label>التاريخ<input id="f4" type="date" value="${e.date}"></label></div>
+ <label>ملاحظة<input id="f5" value="${esc(e.note||'')}"></label><div class="err" id="er"></div><button class="pri" onclick="saveE('${id||''}')">حفظ</button>`);catOpt(e.cat)}
+function catOpt(sel){const t=document.querySelector('[name=et]:checked').value,cur=sel||$('#f3').value;$('#f3').innerHTML=(t=='inc'?INC:CATS).map(c=>`<option ${c==cur?'selected':''}>${c}</option>`).join('')}
+function saveE(id){const a=parseFloat($('#f1').value);if(!(a>0))return err('اكتب مبلغاً صحيحاً');
+ const o={type:document.querySelector('[name=et]:checked').value,amt:a,cur:$('#f2').value,cat:$('#f3').value,date:$('#f4').value||today(),note:$('#f5').value.trim()};
+ if(id)Object.assign(D.ex.find(x=>x.id==id),o);else D.ex.push({id:uid(),...o});save();closeM();view()}
+const delE=id=>ask('حذف هذه الحركة؟',()=>{D.ex=D.ex.filter(x=>x.id!=id);save();view()});
+
+/* ---------- العملات ---------- */
+function curs(){return `<div class="card"><label style="margin:0">العملة الأساسية (تُحوَّل لها كل المجاميع)<select onchange="setBase(this.value)">${co(D.base)}</select></label>
+ <p class="mut" style="margin-top:8px;font-size:12px">الأسعار تقريبية وتُعدَّل يدوياً حسب سعر السوق عندك. السعر = كم ${D.base} تساوي وحدة واحدة من العملة.</p></div>
+ <div class="card">${Object.entries(D.cur).map(([k,c])=>`<div class="crt"><span><b>${k}</b> ${c.s}<br><small>${esc(c.n)}</small></span><input type="number" step="any" inputmode="decimal" value="${+c.r.toPrecision(6)}" ${k==D.base?'disabled':''} onchange="setRate('${k}',this.value)">${k==D.base?'<span></span>':`<button class="del" onclick="delC('${k}')">✕</button>`}</div>`).join('')}</div>
+ <h2>إضافة عملة</h2><div class="card"><div class="two"><label>الرمز (مثل SYP)<input id="c1" maxlength="5" style="text-transform:uppercase"></label><label>الرمز المختصر<input id="c2" maxlength="4"></label></div><label>الاسم<input id="c3"></label><label>السعر مقابل ${D.base}<input id="c4" type="number" step="any" inputmode="decimal"></label><div class="err" id="er"></div><button class="pri" onclick="addC()">إضافة</button></div>`}
+function setRate(k,v){v=parseFloat(v);if(v>0){D.cur[k].r=v;save();}view()}
+function setBase(nb){const f=D.cur[nb].r;Object.values(D.cur).forEach(c=>c.r/=f);D.cur[nb].r=1;D.base=nb;save();$('header small').textContent='العملة الأساسية: '+nb;view()}
+function addC(){const k=$('#c1').value.trim().toUpperCase(),r=parseFloat($('#c4').value);if(!k||D.cur[k]||!(r>0)||!$('#c3').value.trim())return err('أكمل الحقول بسعر صحيح ورمز غير مكرر');D.cur[k]={n:$('#c3').value.trim(),s:$('#c2').value.trim()||k,r};save();view()}
+function delC(k){if(D.debts.some(d=>d.cur==k)||D.ex.some(e=>e.cur==k))return modal('<h3>لا يمكن الحذف</h3><p class="mut">هذه العملة مستخدمة في ديون أو مصاريف.</p>');delete D.cur[k];save();view()}
+
+/* ---------- الإعدادات ---------- */
+function sets(){const t=LS.g('dm_theme','');return `<div class="card"><b>الحساب: ${esc(U)}</b><p class="mut" style="margin:4px 0 10px">${D.debts.length} دين · ${D.ex.length} حركة</p><button onclick="pwM()">تغيير كلمة السر</button> <button class="del" onclick="logout()">تسجيل الخروج</button></div>
+ <div class="card"><label style="margin:0">المظهر<select onchange="LS.s('dm_theme',this.value);theme(this.value)"><option value="" ${!t?'selected':''}>تلقائي</option><option value="light" ${t=='light'?'selected':''}>فاتح</option><option value="dark" ${t=='dark'?'selected':''}>داكن</option></select></label></div>
+ <div class="card"><b>نسخة احتياطية</b><p class="mut" style="margin:4px 0">انسخ النص واحفظه في مكان آمن، ولصقه لاحقاً للاستعادة على أي جهاز.</p><textarea id="bk" onfocus="this.select()">${esc(JSON.stringify(D))}</textarea><div class="acts"><button onclick="cp()">نسخ</button><button onclick="imp()">استعادة من النص</button></div><div class="err" id="er"></div></div>
+ <div class="card"><button class="del" onclick="ask('مسح كل بياناتك؟ لا يمكن التراجع',()=>{D=def();save();view()})">مسح كل البيانات</button></div>`}
+function cp(){const t=$('#bk');t.select();try{navigator.clipboard.writeText(t.value)}catch(e){}err('تم تحديد النص، انسخه إن لم ينسخ تلقائياً')}
+function imp(){try{const o=JSON.parse($('#bk').value);if(!o.cur||!o.base||!Array.isArray(o.debts)||!Array.isArray(o.ex)||!o.cur[o.base])throw 0;D=o;save();shell();tab='sets';view()}catch(e){err('النص غير صالح')}}
+function pwM(){modal(`<h3>تغيير كلمة السر</h3><label>الجديدة<input id="f1" type="password"></label><div class="err" id="er"></div><button class="pri" onclick="chPw()">حفظ</button>`)}
+async function chPw(){const p=$('#f1').value;if(p.length<4)return err('4 أحرف على الأقل');const s=uid();users[U]={s,h:await hash(p,s)};LS.s('dm_users',users);closeM()}
+
+const s=LS.g('dm_sess','');if(s&&users[s])enter(s);else authUI();
+</script></body></html>
