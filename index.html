@@ -110,6 +110,12 @@ button:disabled{opacity:.5;cursor:default}
 #printArea{display:none}
 @page{margin:12mm}
 @media print{body.printing>*:not(#printArea){display:none!important}body.printing{background:#fff!important;padding:0!important}body.printing #printArea{display:block!important;background:#fff}#printArea .inv{color:#000!important}#printArea .inv th{background:#e8f3f1!important}#printArea .inv th,#printArea .inv td{border-color:#999!important}#printArea .inv h4{color:#0f766e!important}#printArea .ih{border-color:#0f766e}#printArea .ifoot{color:#555!important}}
+.lbar{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.lbar button{padding:6px 12px;font-size:13px;border-radius:99px}
+.lbar button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:12px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--bd);display:inline-block}
+.dots i.on{background:var(--pri);width:22px;border-radius:9px}
 </style></head><body>
 <div id="app"></div><div id="m"></div>
 <script>
@@ -170,7 +176,7 @@ function authUI(){
   <div class="err" id="er"></div>
   <button class="pri" id="go" onclick="sendOtp()">إرسال الرمز</button>`;
  }
- $('#app').innerHTML=`<div class="lg"><div class="lc"><div class="logo">${ICON(76)}</div>${stepper(two?2:1)}${body}<p class="lfoot">🔒 بياناتك تبقى على جهازك · <button class="link" style="padding:0;font-size:12px" onclick="privacyM()">سياسة الخصوصية</button></p></div></div>`;
+ $('#app').innerHTML=`<div class="lg"><div class="lc">${langBar()}<div class="logo">${ICON(76)}</div>${stepper(two?2:1)}${body}<p class="lfoot">🔒 بياناتك تبقى على جهازك · <button class="link" style="padding:0;font-size:12px" onclick="privacyM()">سياسة الخصوصية</button></p></div></div>`;
  if(two){bindOtp();startCool()}
  else{const e=$('#em');if(e)e.addEventListener('keydown',x=>{if(x.key==='Enter')sendOtp()})}
 }
@@ -311,7 +317,7 @@ function curs(){return `<div class="card"><label style="margin:0">العملة �
  <div class="card">${Object.entries(D.cur).map(([k,c])=>`<div class="crt"><span><b>${k}</b> ${c.s}<br><small>${esc(c.n)}</small></span><input type="number" step="any" inputmode="decimal" value="${+c.r.toPrecision(6)}" ${k==D.base?'disabled':''} onchange="setRate('${k}',this.value)">${k==D.base?'<span></span>':`<button class="del" onclick="delC('${k}')">✕</button>`}</div>`).join('')}</div>
  <div class="card"><button class="pri" style="margin-top:0" onclick="updRates()">🌐 تحديث الأسعار من الإنترنت</button><button style="width:100%;margin-top:8px" onclick="resetRates()">↺ استعادة الأسعار الافتراضية</button><p class="mut" id="rs" style="margin-top:8px;font-size:12px">يعمل عند الاتصال بالإنترنت.</p></div><h2>إضافة عملة</h2><div class="card"><div class="two"><label>الرمز (مثل SYP)<input id="c1" maxlength="5" style="text-transform:uppercase"></label><label>الرمز المختصر<input id="c2" maxlength="4"></label></div><label>الاسم<input id="c3"></label><label>السعر مقابل ${D.base}<input id="c4" type="number" step="any" inputmode="decimal"></label><div class="err" id="er"></div><button class="pri" onclick="addC()">إضافة</button></div>`}
 function setRate(k,v){v=parseFloat(v);if(v>0){D.cur[k].r=v;save();}view()}
-function setBase(nb){const f=D.cur[nb].r;Object.values(D.cur).forEach(c=>c.r/=f);D.cur[nb].r=1;D.base=nb;save();$('#bsm').textContent='العملة الأساسية: '+nb;view()}
+function setBase(nb){const f=D.cur[nb].r;Object.values(D.cur).forEach(c=>c.r/=f);D.cur[nb].r=1;D.base=nb;save();$('#bsm').textContent=trS('العملة الأساسية: '+nb);view()}
 function addC(){const k=$('#c1').value.trim().toUpperCase(),r=parseFloat($('#c4').value);if(!k||D.cur[k]||!(r>0)||!$('#c3').value.trim())return err('أكمل الحقول بسعر صحيح ورمز غير مكرر');D.cur[k]={n:$('#c3').value.trim(),s:$('#c2').value.trim()||k,r};save();view()}
 function delC(k){if(D.debts.some(d=>d.cur==k)||D.ex.some(e=>e.cur==k))return modal('<h3>لا يمكن الحذف</h3><p class="mut">هذه العملة مستخدمة في ديون أو مصاريف.</p>');delete D.cur[k];save();view()}
 
@@ -336,12 +342,12 @@ function budM(){const b=D.bud||{};modal(`<h3>ميزانية شهرية (${D.base
 function saveBud(){D.bud={};CATS.forEach((c,i)=>{const v=parseFloat($('#b'+i).value);if(v>0)D.bud[c]=v});save();closeM();view()}
 const _debts=debts;debts=()=>fl.debt=='ppl'?`<div class="chips">${CH.map(c=>`<button class="${fl.debt==c[0]?'on':''}" onclick="fl.debt='${c[0]}';view()">${c[1]}</button>`).join('')}</div>${people()}`:_debts();
 function people(){const m={};D.debts.forEach(d=>{const r=rem(d);if(r)m[d.person]=(m[d.person]||0)+conv(r,d.cur)*(d.dir=='in'?1:-1)});const L=Object.entries(m).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
- return L.length?L.map(([n,v])=>`<div class="card row pp" data-n="${esc(n)}" onclick="personM(this.dataset.n)"><b>${esc(n)}</b><b class="${v>=0?'g':'r'}">${v>=0?'له عندي ':''}${fmt(Math.abs(v),D.base)}${v<0?' عليّ':''}</b></div>`.replace('له عندي ','عنده ')):'<p class="mut" style="text-align:center;margin:30px">لا أرصدة مفتوحة</p>'}
+ return L.length?L.map(([n,v])=>`<div class="card row pp" data-n="${esc(n)}" onclick="personM(this.dataset.n)"><b>${esc(n)}</b><b class="${v>=0?'g':'r'}">${v>=0?'له عندي ':''}${fmt(Math.abs(v),D.base)}${v<0?' عليّ':''}</b><button onclick="event.stopPropagation();invM(this.closest('.pp').dataset.n)" style="padding:6px 10px;font-size:13px">🖨️ فاتورة</button></div>`.replace('له عندي ','عنده ')):'<p class="mut" style="text-align:center;margin:30px">لا أرصدة مفتوحة</p>'}
 let cn='';const stmt=n=>`كشف حساب ${n}\n`+D.debts.filter(d=>d.person==n&&rem(d)>0).map(d=>`${d.dir=='in'?'لي عندك':'عليّ لك'}: ${fmt(rem(d),d.cur)}${d.due?' (استحقاق '+d.due+')':''}`).join('\n');
 const sendWa=t=>window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
 function personM(n){cn=n;modal(`<h3>كشف حساب ${esc(n)}</h3>${D.debts.filter(d=>d.person==n).map(d=>`<div class="card row" style="margin-top:8px"><span><span class="tag ${d.dir}">${d.dir=='in'?'لي':'عليّ'}</span> ${d.date}</span><b>${rem(d)?fmt(rem(d),d.cur):'مسددة ✓'}</b></div>`).join('')}<div class="acts"><button onclick="settleM(cn)">🔁 مقاصة</button><button onclick="invM(cn)">🖨️ فاتورة PDF</button></div><button class="pri" onclick="sendWa(stmt(cn))">📲 إرسال الكشف عبر واتساب</button>`)}
 function wa(id){const d=D.debts.find(x=>x.id==id);sendWa(`السلام عليكم ${d.person}، تذكير ودّي بالمبلغ المستحق: ${fmt(rem(d),d.cur)}${d.due?' بتاريخ '+d.due:''}. شكراً لك 🌹`)}
-const _curs=curs;curs=()=>_curs();
+const _curs=curs;curs=()=>`<div class="chips"><button onclick="convM()">🔄 محوّل العملات</button><button onclick="zakatM()">🕌 حاسبة الزكاة</button></div>`+_curs();
 async function updRates(){const e=$('#rs');e.textContent='جارٍ التحديث…';try{const j=await(await fetch('https://open.er-api.com/v6/latest/'+D.base)).json();let n=0;for(const k in D.cur)if(k!=D.base&&j.rates&&j.rates[k]){D.cur[k].r=1/j.rates[k];n++}save();view();$('#rs').textContent='تم تحديث '+n+' عملة ✓'}catch(x){e.textContent='تعذّر التحديث، تأكد من الإنترنت'}}
 function applyRec(){const m=new Date().toISOString().slice(0,7);(D.rec||[]).forEach(r=>{while(r.last<m){let[y,o]=r.last.split('-').map(Number);if(++o>12){o=1;y++}r.last=y+'-'+String(o).padStart(2,'0');D.ex.push({id:uid(),type:r.type,amt:r.amt,cur:r.cur,cat:r.cat,date:r.last+'-01',note:(r.note||'')+' (ثابت)'})}})}
 function recM(){modal(`<h3>حركة شهرية ثابتة</h3><div class="seg"><label><input type="radio" name="rt" value="exp" checked>مصروف</label><label><input type="radio" name="rt" value="inc">دخل</label></div><div class="two"><label>المبلغ<input id="f1" type="number" inputmode="decimal" step="any"></label><label>العملة<select id="f2">${co(D.base)}</select></label></div><label>التصنيف<select id="f3">${[...CATS,...INC.filter(x=>x!='أخرى')].map(c=>`<option>${c}</option>`).join('')}</select></label><label>ملاحظة (مثل: إيجار، راتب)<input id="f5"></label><div class="err" id="er"></div><button class="pri" onclick="saveRec()">حفظ وتكرار كل شهر</button>`)}
@@ -396,7 +402,7 @@ function contactM(){modal(`<h3>تواصل معنا والدعم الفني</h3><
 function sendSupport(wa){const n=$('#f1').value.trim(),t=$('#f2').value,m=$('#f3').value.trim(),dv=$('#f4').checked;if(!m)return err('اكتب رسالتك');const info=dv?`\n\n---\nالإصدار: ${APP.ver}\nالجهاز: ${navigator.userAgent}\nالعملة الأساسية: ${D.base}`:'';const body=`الاسم: ${n}\nالحساب: ${U}\n\n${m}${info}`,subj=`[${APP.name}] ${t}`;if(wa)window.open('https://wa.me/'+APP.wa+'?text='+encodeURIComponent(subj+'\n'+body),'_blank');else location.href='mailto:'+APP.support+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body)}
 async function shareApp(){const d={title:APP.name,text:'إدارة الديون والمصاريف المالية بعدة عملات',url:location.href};try{if(navigator.share)await navigator.share(d);else{await navigator.clipboard.writeText(location.href);modal('<h3>تم النسخ ✓</h3><p class="mut">رابط التطبيق منسوخ، أرسله لأي شخص.</p>')}}catch(e){}}
 function aboutM(){modal(`<h3>${APP.name}</h3><p class="mut">إدارة الديون والمصاريف المالية بعدة عملات</p><div class="card" style="margin-top:10px"><div class="row"><span>الإصدار</span><b>${APP.ver}</b></div><div class="row" style="margin-top:8px"><span>العملة الأساسية</span><b>${D.base}</b></div></div><p class="mut" style="margin-top:12px;font-size:12px;text-align:center">© 2026 ${APP.name}. جميع الحقوق محفوظة.</p>`)}
-const supportCard=()=>`<div class="card"><b>🛟 المساعدة والدعم</b><div class="sl">${[['❓','الأسئلة الشائعة','faqM()'],['💬','تواصل معنا والدعم الفني','contactM()'],['🔒','سياسة الخصوصية','privacyM()'],['📜','شروط الاستخدام','termsM()'],['📤','مشاركة التطبيق','shareApp()'],['ℹ️','عن البرنامج','aboutM()']].map(x=>`<button class="sli" onclick="${x[2]}"><span>${x[0]}</span>${x[1]}<em>‹</em></button>`).join('')}</div></div>`;
+const supportCard=()=>`<div class="card"><b>🛟 المساعدة والدعم</b><div class="sl">${[['❓','الأسئلة الشائعة','faqM()'],['💬','تواصل معنا والدعم الفني','contactM()'],['🔒','سياسة الخصوصية','privacyM()'],['📜','شروط الاستخدام','termsM()'],['📤','مشاركة التطبيق','shareApp()'],['🎓','شرح البرنامج','(WI=0,welcomeM())'],['ℹ️','عن البرنامج','aboutM()']].map(x=>`<button class="sli" onclick="${x[2]}"><span>${x[0]}</span>${x[1]}<em>‹</em></button>`).join('')}</div></div>`;
 const _sets6=sets;sets=()=>profCard()+_sets6()+supportCard();
 
 /* ---------- استعادة الأسعار الافتراضية ---------- */
@@ -410,8 +416,8 @@ function pwStr(v){const sc=(v.length>=6)+(v.length>=10)+(/\d/.test(v)&&/\D/.test
 /* ---------- إكمال الإعداد واسم المستخدم ---------- */
 const takenUn=(un,email)=>Object.keys(users).some(k=>k!==email&&users[k].un===un);
 const unOk=v=>/^[a-z0-9_]{3,20}$/.test(v);
-function setupUI(mode){const nu=mode=='new';
- $('#app').innerHTML=`<div class="lg"><div class="lc"><div class="logo">${ICON(76)}</div>${nu?stepper(3):''}<h1>${nu?'أكمل إعداد حسابك':'عيّن كلمة سر جديدة'}</h1><p class="sub">${nu?'اسم المستخدم وكلمة السر إلزاميين، وبتحتاجهم للدخول لاحقاً.':'اكتب كلمة سر جديدة لحسابك.'}</p>
+function setupUI(mode){SMODE=mode;const nu=mode=='new';
+ $('#app').innerHTML=`<div class="lg"><div class="lc">${langBar()}<div class="logo">${ICON(76)}</div>${nu?stepper(3):''}<h1>${nu?'أكمل إعداد حسابك':'عيّن كلمة سر جديدة'}</h1><p class="sub">${nu?'اسم المستخدم وكلمة السر إلزاميين، وبتحتاجهم للدخول لاحقاً.':'اكتب كلمة سر جديدة لحسابك.'}</p>
  ${nu?`<label>اسم المستخدم<input id="su" dir="ltr" autocomplete="username" autocapitalize="none" placeholder="ahmad_99"></label><p class="mut" style="font-size:12px;margin-top:4px">إنجليزي وأرقام و _ فقط، من 3 إلى 20 حرف.</p>`:''}
  <label>كلمة السر<input id="sp" type="password" dir="ltr" autocomplete="new-password" oninput="pwStr(this.value)"><span class="pwm" style="display:block"><i id="pwi"></i></span><small id="pwt" class="mut"></small></label>
  <label>أعد كتابة كلمة السر<input id="sp2" type="password" dir="ltr" autocomplete="new-password"></label>
@@ -438,12 +444,12 @@ function syncDue(d){if(!d.sched)return;const p=paid(d);let c=0;const nx=d.sched.
 function remindersModal(){const t=today(),wk=addDays(t,7);const L=D.debts.filter(d=>rem(d)>0&&d.due&&d.due<=wk).sort((a,b)=>a.due>b.due?1:-1);if(!L.length)return false;
  const sec=(title,arr)=>arr.length?`<h2 style="font-size:15px">${title}</h2>${arr.map(d=>`<div class="card row"><div><b>${esc(d.person)}</b><br><small class="${d.due<t?'r':''}">${d.due}</small></div><b class="${d.dir=='in'?'g':'r'}">${fmt(rem(d),d.cur)}</b></div>`).join('')}`:'';
  modal(`<h3>🔔 التذكيرات</h3><p class="mut">عندك ${L.length} دين يحتاج متابعة</p>${sec('متأخرة',L.filter(d=>d.due<t))}${sec('مستحقة اليوم',L.filter(d=>d.due==t))}${sec('خلال 7 أيام',L.filter(d=>d.due>t))}`);return true}
-function afterOpen(){setTimeout(()=>{if(LOCK.on)return;const k='dm_rem_'+U;if(LS.g(k,'')!==today()&&remindersModal()){LS.s(k,today());return}bkCheck()},700)}
+function afterOpen(){setTimeout(()=>{if(LOCK.on)return;if(!LS.g('dm_welcome','')){WI=0;welcomeM();return}const k='dm_rem_'+U;if(LS.g(k,'')!==today()&&remindersModal()){LS.s(k,today());return}bkCheck()},700)}
 
 const LOCK={on:false,last:Date.now(),fails:0,busy:false,hidAt:0};
 const PIDLE=5*60e3;
 let PADV='';
-function lockUI(msg){$('#app').innerHTML=`<div class="lg"><div class="lc" style="text-align:center"><div class="logo">${ICON(64)}</div><h1 style="font-size:20px">أدخل رمز PIN</h1><p class="sub" id="lmsg">${msg||'افتح التطبيق برمزك'}</p><div class="pdots">${[0,1,2,3].map(()=>'<i class="pd"></i>').join('')}</div><div class="pad">${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>k===''?'<span></span>':`<button onclick="padKey('${k}')">${k}</button>`).join('')}</div><button class="link" style="margin-top:14px" onclick="logoutFromLock()">نسيت الرمز؟ تسجيل خروج</button></div></div>`;updDots()}
+function lockUI(msg){$('#app').innerHTML=`<div class="lg"><div class="lc" style="text-align:center">${langBar()}<div class="logo">${ICON(64)}</div><h1 style="font-size:20px">أدخل رمز PIN</h1><p class="sub" id="lmsg">${msg||'افتح التطبيق برمزك'}</p><div class="pdots">${[0,1,2,3].map(()=>'<i class="pd"></i>').join('')}</div><div class="pad">${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>k===''?'<span></span>':`<button onclick="padKey('${k}')">${k}</button>`).join('')}</div><button class="link" style="margin-top:14px" onclick="logoutFromLock()">نسيت الرمز؟ تسجيل خروج</button></div></div>`;updDots()}
 function updDots(){document.querySelectorAll('.pd').forEach((el,i)=>el.classList.toggle('on',i<PADV.length))}
 function padKey(k){if(LOCK.busy)return;if(k=='⌫')PADV=PADV.slice(0,-1);else if(PADV.length<4)PADV+=k;updDots();if(PADV.length==4)tryPin()}
 async function tryPin(){LOCK.busy=true;const h=await pbk(PADV,D.pinS);LOCK.busy=false;if(h===D.pinH)return unlock();PADV='';updDots();LOCK.fails++;if(LOCK.fails>=5){logoutFromLock();return}const m=$('#lmsg');if(m)m.textContent='الرمز غير صحيح، باقي '+(5-LOCK.fails)+' محاولات'}
@@ -462,7 +468,7 @@ const pinCard=()=>`<div class="card"><b>🔐 قفل التطبيق</b><p class="
 const _sets7=sets;sets=()=>_sets7().replace('<div class="card"><b>🔑 كلمة السر</b>',()=>pinCard()+'<div class="card"><b>🔑 كلمة السر</b>');
 
 /* ---------- المبيعات والمقاصة والفواتير والسلة والقوالب والبحث والنسخ ---------- */
-const initD=()=>{if(!D)return;D.trash=D.trash||[];D.tpl=D.tpl||[];D.sales=D.sales||[]};
+const initD=()=>{if(!D)return;D.trash=D.trash||[];D.tpl=D.tpl||[];D.sales=D.sales||[];D.cur=D.cur||{};Object.keys(DEF_CUR).forEach(k=>{if(!D.cur[k])D.cur[k]={...DEF_CUR[k]}})};
 const bkKey=()=>'dm_bk_'+U;
 function bkDownload(){dlFile('gt-dayn-backup-'+today()+'.json',JSON.stringify(D),'application/json');LS.s(bkKey(),Date.now());view()}
 function bkCheck(){const last=LS.g(bkKey(),0),age=(Date.now()-last)/864e5;if(!(D.debts.length||D.ex.length||(D.sales||[]).length))return false;if(!(age>=30||(D.bkW!==false&&age>=7)))return false;const k='dm_bknag_'+U;if(LS.g(k,'')===today())return false;LS.s(k,today());modal(`<h3>💾 نسخة احتياطية</h3><p class="mut">${last?'آخر نسخة قبل '+Math.floor(age)+' يوم.':'ما عندك نسخة احتياطية بعد.'} البيانات محفوظة على جهازك فقط، ولو انمسح المتصفح أو تغيّر الجوال بتضيع.</p><button class="pri" onclick="closeM();bkDownload()">📥 تنزيل النسخة الآن</button><button style="width:100%;margin-top:8px" onclick="closeM()">لاحقاً</button>`);return true}
@@ -522,7 +528,7 @@ function invHTML(){const n=INV.n,f=INV.f,t=INV.t,inR=x=>(!f||x>=f)&&(!t||x<=t);
  const ar=debts.filter(d=>d.sched).map(d=>{let c=0;const p=paid(d);return d.sched.map((x,i)=>{c+=x.amt;const ok=p>=c-1e-9;return `<tr><td>${esc(d.note||'دين مقسّط')}</td><td>${i+1}</td><td>${x.due}</td><td>${fmt(x.amt,d.cur)}</td><td>${ok?'مدفوع':x.due<today()?'متأخر':'قادم'}</td></tr>`}).join('')}).join('');
  const sr=sales.map(x=>`<tr><td>${x.date}</td><td>${esc(x.name)}</td><td>${x.qty}</td><td>${fmt(x.price,x.cur)}</td><td>${fmt(x.qty*x.price,x.cur)}</td><td>${fmt(x.qty*(x.price-x.cost),x.cur)}</td><td>${x.credit?'بالدين':'نقداً'}</td></tr>`).join('');
  const sec=(ti,body)=>body?`<h4>${ti}</h4>${body}`:'';
- return `<div class="inv"><div class="ih">${ICON(52)}<div><b>GT-DAYN</b><br><small>كشف حساب وفاتورة</small></div><div class="il">تاريخ الإصدار: ${today()}<br>الفترة: ${f||'البداية'} ← ${t||'اليوم'}</div></div>
+ return `<div class="inv"><div class="ih">${ICON(52)}<div><b>GT-DAYN</b><br><small>كشف حساب وفاتورة</small></div><div class="il">تاريخ الإصدار: ${today()} · ${hijri(today())}<br>الفترة: ${f||'البداية'} ← ${t||'اليوم'}</div></div>
  <div class="ip"><b>الحساب:</b> ${esc(n)}</div>
  <h4>الرصيد الحالي</h4><table><tr><th>العملة</th><th>لي عنده</th><th>عليّ له</th><th>الصافي</th></tr>${sum||'<tr><td colspan="4">لا يوجد رصيد</td></tr>'}</table>
  ${sec('الديون',`<table><tr><th>التاريخ</th><th>البيان</th><th>النوع</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الاستحقاق</th></tr>${dr}</table>`)}
@@ -535,8 +541,196 @@ function invUpd(){const e=$('#invPrev');if(e)e.innerHTML=invHTML()}
 function printInv(){printHTML(invHTML())}
 function printHTML(h){let el=document.getElementById('printArea');if(!el){el=document.createElement('div');el.id='printArea';document.body.appendChild(el)}el.innerHTML=h;document.body.classList.add('printing');const done=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',done)};window.addEventListener('afterprint',done);setTimeout(()=>window.print(),80)}
 
-const _debts3=debts;debts=()=>`<div class="chips"><button onclick="advM()">🔎 بحث شامل</button></div>`+_debts3();
+const _debts3=debts;debts=()=>`<div class="chips"><button onclick="advM()">🔎 بحث شامل</button><button onclick="splitM()">✂️ قسمة مصروف</button></div>`+_debts3();
 const _sets8=sets;sets=()=>_sets8()+`<div class="card"><b>🗑️ سلة المحذوفات</b><p class="mut" style="margin:4px 0 10px">${(D.trash||[]).length} عنصر، يبقى 30 يوم.</p><button onclick="trashM()">فتح السلة</button></div><div class="card"><b>💾 النسخ الاحتياطي</b><p class="mut" style="margin:4px 0 10px">${LS.g(bkKey(),0)?'آخر نسخة: '+new Date(LS.g(bkKey(),0)).toLocaleDateString('ar'):'ما عندك نسخة بعد'}</p><label style="display:flex;gap:8px;align-items:center;margin-top:0"><input type="checkbox" ${D.bkW!==false?'checked':''} onchange="D.bkW=this.checked;save()" style="width:auto;margin:0">تذكيري أسبوعياً بالنسخ الاحتياطي</label><div class="acts"><button onclick="bkDownload()">📥 نزّل نسخة الآن</button></div></div>`;
+
+/* ---------- اللغات والشرح والزكاة والمحوّل والقسمة والهجري ---------- */
+/* ---I18N-START--- */
+let LANG=LS.g('dm_lang','ar');
+const I18N=[
+["أهلاً بك في GT-DAYN","Welcome to GT-DAYN","GT-DAYN'e hoş geldiniz"],
+["أهلاً","Hello","Merhaba"],
+["العملة الأساسية:","Base currency:","Temel para birimi:"],
+["حسابي","My account","Hesabım"],
+["الرئيسية","Home","Ana sayfa"],
+["الديون","Debts","Borçlar"],
+["المصاريف","Expenses","Giderler"],
+["العملات","Currencies","Para birimleri"],
+["الإعدادات","Settings","Ayarlar"],
+["لي عند الناس","Owed to me","Bana borçlu olanlar"],
+["عليّ للناس","I owe","Borçlu olduklarım"],
+["صافي الديون","Net debts","Net borç"],
+["رصيد هذا الشهر","This month's balance","Bu ayın bakiyesi"],
+["مصاريف هذا الشهر","This month's expenses","Bu ayki giderler"],
+["آخر 6 أشهر","Last 6 months","Son 6 ay"],
+["أقرب الاستحقاقات","Upcoming due dates","Yaklaşan vadeler"],
+["الديون حسب العملة","Debts by currency","Para birimine göre borçlar"],
+["لا توجد ديون","No debts yet","Henüz borç yok"],
+["لا مصاريف بعد","No expenses yet","Henüz gider yok"],
+["لا توجد حركات في هذا الشهر","No entries this month","Bu ay hareket yok"],
+["بحث بالاسم أو الملاحظة","Search by name or note","İsim veya nota göre ara"],
+["بحث شامل","Advanced search","Gelişmiş arama"],
+["بحث","Search","Ara"],
+["لا أرصدة مفتوحة","No open balances","Açık bakiye yok"],
+["إرسال الكشف عبر واتساب","Send statement via WhatsApp","Ekstreyi WhatsApp ile gönder"],
+["فاتورة PDF","PDF invoice","PDF fatura"],
+["فاتورة","Invoice","Fatura"],
+["مقاصة","Netting","Mahsup"],
+["دين جديد","New debt","Yeni borç"],
+["تعديل دين","Edit debt","Borcu düzenle"],
+["لي عنده","Owes me","Bana borçlu"],
+["عليّ له","I owe","Borçluyum"],
+["لي عند شخص","Someone owes me","Birinden alacağım var"],
+["عليّ لشخص","I owe someone","Birine borcum var"],
+["الاسم","Name","Ad"],
+["إجمالي المبلغ","Total amount","Toplam tutar"],
+["المبلغ","Amount","Tutar"],
+["العملة","Currency","Para birimi"],
+["التاريخ","Date","Tarih"],
+["الاستحقاق","Due date","Vade tarihi"],
+["ملاحظة","Note","Not"],
+["حفظ والدخول","Save & sign in","Kaydet ve giriş yap"],
+["حفظ القالب","Save template","Şablonu kaydet"],
+["حفظ البيع","Save sale","Satışı kaydet"],
+["حفظ القسمة","Save split","Paylaşımı kaydet"],
+["حفظ","Save","Kaydet"],
+["إلغاء والرجوع","Cancel & go back","İptal et ve geri dön"],
+["إلغاء","Cancel","İptal"],
+["حذف الصورة","Remove photo","Fotoğrafı kaldır"],
+["تأكيد ودخول","Confirm & sign in","Onayla ve giriş yap"],
+["إعادة الإرسال","Resend","Tekrar gönder"],
+["تغيير البريد","Change email","E-postayı değiştir"],
+["إرسال الرمز","Send code","Kodu gönder"],
+["تحقق من بريدك","Check your email","E-postanızı kontrol edin"],
+["أرسلنا رمزاً من 6 أرقام إلى","We sent a 6-digit code to","6 haneli kodu şu adrese gönderdik:"],
+["ادخل بريدك وسنرسل لك رمزاً للتأكيد. أول مرة؟ بعد الرمز بتكمل اسم المستخدم وكلمة السر.","Enter your email and we will send a code. First time? After the code you will set a username and password.","E-postanızı girin, size bir kod göndereceğiz. İlk kez mi? Koddan sonra kullanıcı adı ve şifre belirleyeceksiniz."],
+["البريد الإلكتروني","Email","E-posta"],
+["بياناتك تبقى على جهازك","Your data stays on your device","Verileriniz cihazınızda kalır"],
+["سياسة الخصوصية","Privacy policy","Gizlilik politikası"],
+["أكمل إعداد حسابك","Complete your account setup","Hesabınızı tamamlayın"],
+["اسم المستخدم","Username","Kullanıcı adı"],
+["كلمة السر","Password","Şifre"],
+["أعد كتابة كلمة السر","Re-enter password","Şifreyi tekrar yazın"],
+["كلمة السر ضعيفة","Weak password","Zayıf şifre"],
+["كلمة السر متوسطة","Medium password","Orta güçte şifre"],
+["كلمة السر قوية","Strong password","Güçlü şifre"],
+["كلمتا السر غير متطابقتين","Passwords do not match","Şifreler eşleşmiyor"],
+["كلمة السر 6 أحرف على الأقل","Password must be at least 6 characters","Şifre en az 6 karakter olmalı"],
+["أدخل رمز PIN","Enter PIN","PIN girin"],
+["افتح التطبيق برمزك","Unlock the app with your PIN","Uygulamayı PIN kodunuzla açın"],
+["نسيت الرمز؟ تسجيل خروج","Forgot PIN? Sign out","PIN'i unuttunuz mu? Çıkış yapın"],
+["الرمز غير صحيح","Incorrect code","Kod yanlış"],
+["انتهت صلاحية الرمز","Code expired","Kodun süresi doldu"],
+["أدخل الرمز كاملاً","Enter the full code","Kodun tamamını girin"],
+["اكتب بريداً إلكترونياً صحيحاً","Enter a valid email","Geçerli bir e-posta girin"],
+["قفل التطبيق","App lock","Uygulama kilidi"],
+["تفعيل رمز PIN","Enable PIN","PIN'i etkinleştir"],
+["تغيير الرمز","Change PIN","PIN'i değiştir"],
+["إزالة القفل","Remove lock","Kilidi kaldır"],
+["تغيير كلمة السر","Change password","Şifreyi değiştir"],
+["إنشاء كلمة سر","Create password","Şifre oluştur"],
+["تسجيل الخروج","Sign out","Çıkış yap"],
+["سلة المحذوفات","Trash","Çöp kutusu"],
+["فتح السلة","Open trash","Çöpü aç"],
+["استعادة","Restore","Geri yükle"],
+["تفريغ السلة نهائياً","Empty trash permanently","Çöpü kalıcı olarak boşalt"],
+["النسخ الاحتياطي","Backup","Yedekleme"],
+["نزّل نسخة الآن","Download backup now","Yedeği şimdi indir"],
+["تنزيل النسخة الآن","Download backup now","Yedeği şimdi indir"],
+["تذكيري أسبوعياً بالنسخ الاحتياطي","Remind me weekly to back up","Haftalık yedekleme hatırlat"],
+["لاحقاً","Later","Sonra"],
+["التذكيرات","Reminders","Hatırlatıcılar"],
+["مستحقة اليوم","Due today","Bugün vadesi dolan"],
+["خلال 7 أيام","Within 7 days","7 gün içinde"],
+["متأخرة","Overdue","Gecikmiş"],
+["مسددة","Settled","Ödendi"],
+["الأشخاص","People","Kişiler"],
+["الأقساط","Installments","Taksitler"],
+["عدد الأقساط","Number of installments","Taksit sayısı"],
+["تاريخ أول قسط","First installment date","İlk taksit tarihi"],
+["السجل","History","Geçmiş"],
+["تعديل الاسم","Edit name","Adı düzenle"],
+["تعديل حركة","Edit entry","Kaydı düzenle"],
+["حركة جديدة","New entry","Yeni kayıt"],
+["المصاريف والدخل","Expenses & income","Gider ve gelir"],
+["الدخل","Income","Gelir"],
+["مصروف","Expense","Gider"],
+["المبيعات","Sales","Satışlar"],
+["إجمالي المبيعات","Total sales","Toplam satış"],
+["صافي الربح","Net profit","Net kâr"],
+["هامش الربح","Profit margin","Kâr marjı"],
+["التكلفة","Cost","Maliyet"],
+["بيع جديد","New sale","Yeni satış"],
+["البضاعة أو الخدمة","Item or service","Ürün veya hizmet"],
+["الكمية","Quantity","Miktar"],
+["الشخص (اختياري)","Person (optional)","Kişi (isteğe bağlı)"],
+["القوالب","Templates","Şablonlar"],
+["إضافة اليوم","Add today","Bugün ekle"],
+["قالب جديد","New template","Yeni şablon"],
+["محوّل العملات","Currency converter","Para birimi çevirici"],
+["حاسبة الزكاة","Zakat calculator","Zekat hesaplayıcı"],
+["قسمة مصروف","Split an expense","Gideri paylaştır"],
+["شرح البرنامج","App guide","Uygulama rehberi"],
+["المساعدة والدعم","Help & support","Yardım ve destek"],
+["الأسئلة الشائعة","FAQ","Sık sorulan sorular"],
+["تواصل معنا والدعم الفني","Contact us & tech support","Bize ulaşın ve teknik destek"],
+["شروط الاستخدام","Terms of use","Kullanım koşulları"],
+["مشاركة التطبيق","Share app","Uygulamayı paylaş"],
+["عن البرنامج","About","Hakkında"],
+["اللغة","Language","Dil"],
+["إضافة عملة","Add currency","Para birimi ekle"],
+["تحديث الأسعار من الإنترنت","Update rates online","Kurları internetten güncelle"],
+["استعادة الأسعار الافتراضية","Restore default rates","Varsayılan kurları geri yükle"],
+["مسح كل البيانات","Erase all data","Tüm verileri sil"],
+["استعادة من ملف","Restore from file","Dosyadan geri yükle"],
+["تصدير CSV","Export CSV","CSV dışa aktar"],
+["الحركات الشهرية الثابتة","Recurring monthly entries","Aylık sabit hareketler"],
+["أول مرة؟","First time?","İlk kez mi?"],
+["السابق","Back","Geri"],
+["التالي","Next","İleri"],
+["ابدأ","Get started","Başla"],
+["تخطي","Skip","Atla"],
+["الكل","All","Tümü"]
+];
+const I18M={en:I18N.map(x=>[x[0],x[1]]).sort((a,b)=>b[0].length-a[0].length),tr:I18N.map(x=>[x[0],x[2]]).sort((a,b)=>b[0].length-a[0].length)};
+function trS(t){if(LANG=='ar'||!t)return t;let o=t;for(const [a,b] of (I18M[LANG]||[])){if(o.indexOf(a)>=0)o=o.split(a).join(b)}return o}
+function trNode(n){if(LANG=='ar'||!n)return;if(n.nodeType==3){const v=trS(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;return}if(n.nodeType!==1||n.tagName=='SCRIPT'||n.tagName=='STYLE')return;['placeholder','aria-label','title'].forEach(at=>{if(n.hasAttribute(at)){const v=trS(n.getAttribute(at));if(v!==n.getAttribute(at))n.setAttribute(at,v)}});n.childNodes.forEach(trNode)}
+function applyLangAttrs(){document.documentElement.lang=LANG;document.documentElement.dir=LANG=='ar'?'rtl':'ltr'}
+const LX=(a,e,t)=>LANG=='en'?e:LANG=='tr'?t:a;
+/* ---I18N-END--- */
+new MutationObserver(ms=>{if(LANG=='ar')return;ms.forEach(m=>m.addedNodes.forEach(trNode))}).observe(document.body,{childList:true,subtree:true});
+applyLangAttrs();
+
+const langBar=()=>`<div class="lbar">${[['ar','العربية'],['en','English'],['tr','Türkçe']].map(([k,v])=>`<button class="${LANG==k?'on':''}" onclick="setLang('${k}')">${v}</button>`).join('')}</div>`;
+let SMODE='new';
+function setLang(l){LANG=l;LS.s('dm_lang',l);applyLangAttrs();if(LOCK.on)return lockUI();if(U&&D)return shell();if(document.getElementById('sp'))return setupUI(SMODE);authUI()}
+const _sets9=sets;sets=()=>_sets9()+`<div class="card"><b>🌐 ${LX('اللغة','Language','Dil')}</b><div style="margin-top:8px">${langBar()}</div></div>`;
+
+const DEF_CUR={QAR:{n:'ريال قطري',s:'ر.ق',r:.2747},BHD:{n:'دينار بحريني',s:'د.ب',r:2.6526},OMR:{n:'ريال عماني',s:'ر.ع',r:2.5974},INR:{n:'روبية هندية',s:'₹',r:.012},PKR:{n:'روبية باكستانية',s:'₨',r:.0036},CAD:{n:'دولار كندي',s:'C$',r:.73},AUD:{n:'دولار أسترالي',s:'A$',r:.66}};
+Object.assign(DEF_RATES,Object.fromEntries(Object.entries(DEF_CUR).map(([k,v])=>[k,v.r])));
+
+function hijri(d){try{return new Intl.DateTimeFormat(LANG=='ar'?'ar-SA-u-ca-islamic':'en-u-ca-islamic',{day:'numeric',month:'long',year:'numeric'}).format(new Date(d+'T12:00:00'))}catch(e){return ''}}
+const _home9=home;home=()=>`<p class="mut" style="text-align:center;margin:0 0 8px;font-size:13px">📅 ${hijri(today())} · ${today()}</p>`+_home9();
+
+const WELC={
+ar:[["مرحباً بك في GT-DAYN","برنامج يساعدك تدير ديونك ومصاريفك ومبيعاتك بعدة عملات. كل بياناتك تبقى على جهازك."],["الديون والأقساط","سجّل اللي لك واللي عليك، وأضف دفعات جزئية، أو قسّط المبلغ على شهور، والتذكيرات تنبهك قبل الاستحقاق."],["المصاريف والمبيعات","سجّل مصاريفك ودخلك، وسجّل بيعاتك وشوف الربح مباشرة. البيع بالدين ينحفظ تلقائياً كدين."],["الفواتير والتقارير","فاتورة PDF لكل شخص جاهزة للطباعة، ومقاصة بين الديون، وقسمة المصاريف المشتركة بين الأصدقاء."],["أدوات يومية","حاسبة الزكاة، ومحوّل عملات، والتاريخ الهجري، وأكثر من 15 عملة بينها عملات الخليج."],["أمانك أولاً","رمز PIN وقفل تلقائي ونسخ احتياطية. ما في سيرفر يحفظ بياناتك."]],
+en:[["Welcome to GT-DAYN","An app to manage your debts, expenses and sales in multiple currencies. All your data stays on your device."],["Debts & installments","Track what you owe and what you are owed, record partial payments, split amounts into monthly installments, and get due-date reminders."],["Expenses & sales","Log expenses and income, record sales and see the profit instantly. Sales on credit are added to debts automatically."],["Invoices & reports","Printable PDF invoices per person, debt netting between people, and splitting shared bills among friends."],["Everyday tools","Zakat calculator, currency converter, Hijri date display, and over 15 currencies including Gulf currencies."],["Your safety first","PIN lock, auto-lock and backups. No server stores your data."]],
+tr:[["GT-DAYN'e hoş geldiniz","Borçlarınızı, giderlerinizi ve satışlarınızı birden fazla para biriminde yönetmenize yardımcı olan bir uygulama. Tüm verileriniz cihazınızda kalır."],["Borçlar ve taksitler","Borçlarınızı ve alacaklarınızı takip edin, kısmi ödemeler kaydedin, tutarları aylık taksitlere bölün ve vade hatırlatıcıları alın."],["Giderler ve satışlar","Gider ve gelirlerinizi kaydedin, satışlarınızı girin ve kârı anında görün. Veresiye satışlar otomatik olarak borca eklenir."],["Faturalar ve raporlar","Kişiye özel yazdırılabilir PDF faturalar, kişiler arası borç mahsuplaştırma ve arkadaşlar arasında ortak giderlerin paylaştırılması."],["Günlük araçlar","Zekat hesaplayıcı, para birimi çevirici, Hicri tarih gösterimi ve Körfez para birimleri dahil 15'ten fazla para birimi."],["Önce güvenliğiniz","PIN kilidi, otomatik kilit ve yedeklemeler. Verilerinizi hiçbir sunucu saklamaz."]]
+};
+let WI=0;
+function welcomeM(){const S=WELC[LANG]||WELC.ar,s=S[WI],last=WI==S.length-1;modal(`<div style="text-align:center">${ICON(72)}</div><div class="dots">${S.map((_,i)=>`<i class="${i==WI?'on':''}"></i>`).join('')}</div><h3 style="text-align:center;margin-top:10px">${s[0]}</h3><p class="pt" style="text-align:center;font-size:15px">${s[1]}</p><div class="acts" style="justify-content:space-between;margin-top:16px"><button ${WI==0?'disabled':''} onclick="WI--;welcomeM()">${LX('السابق','Back','Geri')}</button><button class="pri" style="margin:0;width:auto;padding:10px 20px" onclick="${last?'welcomeDone()':'WI++;welcomeM()'}">${last?LX('ابدأ','Get started','Başla'):LX('التالي','Next','İleri')}</button></div><button class="link" style="width:100%;margin-top:10px" onclick="welcomeDone()">${LX('تخطي','Skip','Atla')}</button>`)}
+function welcomeDone(){LS.s('dm_welcome','1');WI=0;closeM()}
+
+function zakatM(){modal(`<h3>🕌 ${LX('حاسبة الزكاة','Zakat calculator','Zekat hesaplayıcı')}</h3><p class="mut">${LX('تقريبية. استشر عالماً أو مختصاً لحالتك.','Approximate. Consult a scholar for your case.','Yaklaşık sonuçtur. Durumunuz için bir uzmana danışın.')}</p><label>${LX('النقد والمدخرات','Cash & savings','Nakit ve birikimler')}<input id="z1" type="number" inputmode="decimal" step="any" oninput="zakatCalc()"></label><label>${LX('قيمة الذهب والفضة','Gold & silver value','Altın ve gümüş değeri')}<input id="z2" type="number" inputmode="decimal" step="any" oninput="zakatCalc()"></label><label>${LX('ديون لك عند الناس','Money owed to you','Alacaklarınız')}<input id="z3" type="number" inputmode="decimal" step="any" oninput="zakatCalc()"></label><label>${LX('ديون عليك (تُخصم)','Your debts (deducted)','Borçlarınız (düşülür)')}<input id="z4" type="number" inputmode="decimal" step="any" oninput="zakatCalc()"></label><label>${LX('قيمة النصاب بعملتك','Nisab value in your currency','Nisap değeri (para biriminizde)')}<input id="z5" type="number" inputmode="decimal" step="any" oninput="zakatCalc()"></label><div class="calc" id="zr"></div>`);zakatCalc()}
+function zakatCalc(){const v=id=>+($('#'+id).value)||0,base=v('z1')+v('z2')+v('z3')-v('z4'),nis=v('z5'),due=nis>0&&base>=nis?base*0.025:0;$('#zr').innerHTML=`<div class="row"><span>${LX('الوعاء الزكوي','Zakat base','Zekat matrahı')}</span><b>${fmt(Math.max(0,base),D.base)}</b></div><div class="row" style="font-size:18px;margin-top:6px"><span>${LX('الزكاة المستحقة 2.5%','Zakat due (2.5%)','Ödenecek zekat (%2,5)')}</span><b>${fmt(due,D.base)}</b></div><small>${nis<=0?LX('أدخل قيمة النصاب','Enter the nisab value','Nisap değerini girin'):base>=nis?LX('بلغ النصاب، فيه زكاة','Above nisab, zakat applies','Nisap aşıldı, zekat gerekir'):LX('ما بلغ النصاب، ما فيه زكاة','Below nisab, no zakat due','Nisabın altında, zekat gerekmez')}</small>`}
+
+function convM(){const first=Object.keys(D.cur)[0],opt=x=>Object.keys(D.cur).map(c=>`<option value="${c}" ${c==x?'selected':''}>${c} · ${esc(D.cur[c].n)}</option>`).join('');modal(`<h3>🔄 ${LX('محوّل العملات','Currency converter','Para birimi çevirici')}</h3><label>${LX('المبلغ','Amount','Tutar')}<input id="cv1" type="number" inputmode="decimal" step="any" value="1" oninput="convCalc()"></label><div class="two"><label>${LX('من','From','Kimden')}<select id="cv2" onchange="convCalc()">${opt(D.cur.USD?'USD':first)}</select></label><label>${LX('إلى','To','Kime')}<select id="cv3" onchange="convCalc()">${opt(D.cur.SAR?'SAR':D.base)}</select></label></div><div class="calc" id="cvr"></div><small class="mut">${LX('حسب الأسعار المحفوظة في تبويب العملات.','Uses the rates saved in the Currencies tab.','Para birimleri sekmesindeki kayıtlı kurlar kullanılır.')}</small>`);convCalc()}
+function convCalc(){const a=+$('#cv1').value||0,f=$('#cv2').value,t=$('#cv3').value,r=a*D.cur[f].r/D.cur[t].r;$('#cvr').innerHTML=`<div class="row" style="font-size:18px"><span>${fmt(a,f)}</span><b>= ${fmt(r,t)}</b></div>`}
+
+function splitM(){modal(`<h3>✂️ ${LX('قسمة مصروف','Split an expense','Gideri paylaştır')}</h3><p class="mut">${LX('اكتب المبلغ الكلي وأسماء الأشخاص، ينقسم بالتساوي، ويتسجّل دين على كل واحد.','Enter the total and names. It is split equally and each person gets a debt.','Toplamı ve isimleri girin. Eşit paylaştırılır ve her kişi için borç kaydedilir.')}</p><label>${LX('الوصف','Description','Açıklama')}<input id="sp1" placeholder="${LX('عشاء','Dinner','Akşam yemeği')}"></label><div class="two"><label>${LX('المبلغ الكلي','Total','Toplam')}<input id="sp2" type="number" inputmode="decimal" step="any" oninput="splitCalc()"></label><label>${LX('العملة','Currency','Para birimi')}<select id="sp3" onchange="splitCalc()">${co(D.base)}</select></label></div><label>${LX('الأشخاص (افصل بفاصلة)','People (comma separated)','Kişiler (virgülle ayırın)')}<input id="sp4" oninput="splitCalc()" placeholder="${LX('أحمد، سارة','Ahmed, Sara','Ali, Ayşe')}"></label><div class="calc" id="spr"></div><div class="err" id="er"></div><button class="pri" onclick="splitSave()">${LX('حفظ القسمة','Save split','Paylaşımı kaydet')}</button>`);splitCalc()}
+const splitNames=()=>($('#sp4').value||'').split(/[,،]/).map(x=>x.trim()).filter(Boolean);
+function splitCalc(){const t=+$('#sp2').value||0,n=splitNames().length,sh=n?t/(n+1):0;$('#spr').innerHTML=`<div class="row"><span>${LX('حصة كل شخص','Each person owes','Her kişinin payı')}</span><b>${fmt(sh,$('#sp3').value)}</b></div><small>${LX('تدفع وتحسب حصتك كمان، يعني القسمة على عدد الأشخاص + 1.','You pay and keep your share too, so divide by people + 1.','Siz de dahil olduğunuz için kişi sayısı + 1 ile bölünür.')}</small>`}
+function splitSave(){const t=+$('#sp2').value,names=splitNames(),cu=$('#sp3').value,desc=($('#sp1').value||'').trim();if(!(t>0))return err(LX('اكتب مبلغاً صحيحاً','Enter a valid amount','Geçerli bir tutar girin'));if(!names.length)return err(LX('اكتب اسم شخص واحد على الأقل','Enter at least one name','En az bir isim girin'));const sh=+(t/(names.length+1)).toFixed(2),date=today();names.forEach(n=>D.debts.push({id:uid(),dir:'in',person:n,amt:sh,cur:cu,date,due:'',note:desc||LX('قسمة','Split','Paylaşım'),pays:[]}));save();closeM();view()}
 
 const s=LS.g('dm_sess','');
 if(s){const sd=LS.g('dm_d_'+s,null);if(sd&&sd.pinH){U=s;D=sd;LOCK.on=true;lockUI()}else enter(s)}else authUI();
