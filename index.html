@@ -147,7 +147,7 @@ async function sendOtp(again,purpose){
  const b=$('#go')||$('#rs');if(b)b.disabled=true;
  const code=genCode();
  try{if(EMAIL_READY)await sendMail(AU.email,code)}
- catch(x){if(b)b.disabled=false;return err('تعذّر إرسال الرمز، تأكد من الاتصال وحاول مرة أخرى')}
+ catch(x){if(b)b.disabled=false;return err('تعذّر الإرسال: '+String(x&&x.message||x).slice(0,200))}
  Object.assign(AU,{code,exp:Date.now()+6e5,tries:0,cool:Date.now()+6e4,step:2});
  authUI();
 }
