@@ -82,6 +82,20 @@ button:disabled{opacity:.5;cursor:default}
 .sli{display:flex;align-items:center;gap:10px;width:100%;text-align:right;background:none;border:0;border-bottom:1px solid var(--bd);border-radius:0;padding:13px 4px;color:var(--tx);font-size:15px}
 .sli span{width:26px;text-align:center}
 .sli em{margin-left:auto;font-style:normal;color:var(--mut)}
+.pdots{display:flex;gap:14px;justify-content:center;margin:18px 0}
+.pd{width:14px;height:14px;border-radius:50%;border:2px solid var(--pri2);display:inline-block}
+.pd.on{background:var(--pri2)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:260px;margin:0 auto}
+.pad button{font-size:22px;padding:14px 0;border-radius:16px;font-weight:700}
+.steps{display:flex;align-items:center;justify-content:center;gap:4px;margin:0 0 16px}
+.stp{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--mut);min-width:58px}
+.stp b{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--in);border:2px solid var(--bd);color:var(--mut);font-size:14px}
+.stp.on{color:var(--pri);font-weight:700}
+.stp.on b{background:var(--pri);border-color:var(--pri);color:#fff;box-shadow:0 0 0 4px #14b8a633}
+.stp.done b{background:var(--pri2);border-color:var(--pri2);color:#fff}
+.stl{width:34px;height:2px;background:var(--bd);margin-bottom:18px}
+.pwm{height:6px;border-radius:9px;background:var(--in);overflow:hidden;margin-top:8px}
+.pwm i{display:block;height:100%;width:0;transition:width .3s,background .3s}
 </style></head><body>
 <div id="app"></div><div id="m"></div>
 <script>
@@ -125,7 +139,7 @@ async function sendMail(to,code){
 }
 function setMode(m){const e=$('#em');if(e)AU.email=e.value.trim().toLowerCase();AU.mode=m;AU.step=1;authUI()}
 function authUI(){
- const two=AU.step==2,pass=AU.mode=='pass';
+ const two=AU.step==2;
  let body;
  if(two){
   body=`<h1>تحقق من بريدك</h1>
@@ -137,19 +151,14 @@ function authUI(){
   <div class="row" style="margin-top:6px"><button class="link" id="rs" onclick="sendOtp(true)">إعادة الإرسال</button><button class="link" onclick="AU.step=1;authUI()">تغيير البريد</button></div>`;
  }else{
   body=`<h1>أهلاً بك في GT-DAYN</h1>
-  <p class="sub">${pass?'ادخل ببريدك وكلمة السر':'سجّل دخولك ببريدك، وسنرسل لك رمزاً للتأكيد'}</p>
-  <div class="tabs"><button class="${pass?'':'on'}" onclick="setMode('code')">📧 بالرمز</button><button class="${pass?'on':''}" onclick="setMode('pass')">🔑 بكلمة السر</button></div>
-  <label>البريد الإلكتروني<input id="em" type="email" inputmode="email" dir="ltr" autocomplete="email" placeholder="name@example.com" value="${esc(AU.email)}"></label>
-  ${pass?`<label>كلمة السر<input id="pw" type="password" dir="ltr" autocomplete="current-password"></label>
+  <p class="sub">ادخل بريدك وسنرسل لك رمزاً للتأكيد. أول مرة؟ بعد الرمز بتكمل اسم المستخدم وكلمة السر.</p>
+  <label>البريد الإلكتروني<input id="em" type="email" inputmode="email" dir="ltr" autocomplete="email" autocapitalize="none" placeholder="name@example.com" value="${esc(AU.email)}"></label>
   <div class="err" id="er"></div>
-  <button class="pri" onclick="passLogin()">دخول</button>
-  <div class="row" style="margin-top:6px"><button class="link" onclick="sendOtp(false,'reset')">نسيت كلمة السر؟</button><small>أول مرة؟ ادخل بالرمز أولاً</small></div>`
-  :`<div class="err" id="er"></div>
-  <button class="pri" id="go" onclick="sendOtp()">إرسال الرمز</button>`}`;
+  <button class="pri" id="go" onclick="sendOtp()">إرسال الرمز</button>`;
  }
- $('#app').innerHTML=`<div class="lg"><div class="lc"><div class="logo">${ICON(76)}</div>${body}<p class="lfoot">🔒 بياناتك تبقى على جهازك · <button class="link" style="padding:0;font-size:12px" onclick="privacyM()">سياسة الخصوصية</button></p></div></div>`;
+ $('#app').innerHTML=`<div class="lg"><div class="lc"><div class="logo">${ICON(76)}</div>${stepper(two?2:1)}${body}<p class="lfoot">🔒 بياناتك تبقى على جهازك · <button class="link" style="padding:0;font-size:12px" onclick="privacyM()">سياسة الخصوصية</button></p></div></div>`;
  if(two){bindOtp();startCool()}
- else document.querySelectorAll('.lc input').forEach(x=>x.addEventListener('keydown',e=>{if(e.key==='Enter')pass?passLogin():sendOtp()}));
+ else{const e=$('#em');if(e)e.addEventListener('keydown',x=>{if(x.key==='Enter')sendOtp()})}
 }
 async function sendOtp(again,purpose){
  if(!again){const e=$('#em').value.trim().toLowerCase();if(!isMail(e))return err('اكتب بريداً إلكترونياً صحيحاً');AU.email=e;AU.purpose=purpose||'login'}
@@ -162,14 +171,18 @@ async function sendOtp(again,purpose){
  authUI();
 }
 function passLogin(){
- const e=$('#em').value.trim().toLowerCase(),p=$('#pw').value;
- if(!isMail(e))return err('اكتب بريداً إلكترونياً صحيحاً');
- AU.email=e;
- const u=users[e];
+ const idv=$('#em').value.trim().toLowerCase(),p=$('#pw').value;
+ const key=isMail(idv)?idv:(Object.keys(users).find(k=>users[k].un===idv)||null);
+ const u=key?users[key]:null;
  if(!u)return err('البريد أو كلمة السر غلط');
- if(!u.h)return err('ما عندك كلمة سر بعد. ادخل بالرمز أولاً ثم أنشئ كلمة سر من الإعدادات');
- if(AU.fails>=5)return err('محاولات كثيرة. استخدم الرمز البريدي أو اضغط نسيت كلمة السر');
- pbk(p,u.s).then(h=>{if(h!==u.h){AU.fails++;return err('البريد أو كلمة السر غلط')}AU.fails=0;enter(e)});
+ if(!u.h)return err('حسابك ما اكتمل بعد، ادخل بالرمز البريدي وأكمل الإعداد');
+ if(AU.fails>=5)return err('محاولات كثيرة. استخدم الرمز البريدي');
+ pbk(p,u.s).then(h=>{
+  if(h!==u.h){AU.fails++;return err('البريد أو كلمة السر غلط')}
+  AU.fails=0;AU.email=key;
+  if(!u.un){setupUI('new');return}
+  enter(key);
+ });
 }
 function startCool(){
  clearInterval(AU.timer);
@@ -197,10 +210,9 @@ function verifyOtp(){
  }
  const reset=AU.purpose=='reset';
  AU.code='';AU.step=1;AU.purpose='login';
- enter(AU.email);
- if(reset)pwM();
+ const u=users[AU.email]||{};if(reset&&u.un&&u.h)setupUI('pw');else if(u.un&&u.h)enter(AU.email);else setupUI('new');
 }
-function enter(u){U=u;if(!users[u]){users[u]={};LS.s('dm_users',users)}D=LS.g('dm_d_'+u,null)||def();applyRec();save();LS.s('dm_sess',u);tab='home';clearInterval(AU.timer);shell()}
+function enter(u){U=u;if(!users[u]){users[u]={};LS.s('dm_users',users)}D=LS.g('dm_d_'+u,null)||def();applyRec();save();LS.s('dm_sess',u);tab='home';clearInterval(AU.timer);shell();afterOpen()}
 const logout=()=>{LS.s('dm_sess','');U=D=null;AU=AU0();authUI()};
 function pwM(){const has=!!(users[U]&&users[U].h);modal(`<h3>${has?'تغيير كلمة السر':'إنشاء كلمة سر'}</h3><p class="mut" style="margin-bottom:6px">تقدر تدخل بها بدل الرمز. 6 أحرف على الأقل.</p><label>كلمة السر الجديدة<input id="f1" type="password" dir="ltr" autocomplete="new-password"></label><label>أعد كتابتها<input id="f2" type="password" dir="ltr" autocomplete="new-password"></label><div class="err" id="er"></div><button class="pri" onclick="savePw()">حفظ</button>`)}
 async function savePw(){const a=$('#f1').value,b=$('#f2').value;if(a.length<6)return err('6 أحرف على الأقل');if(a!==b)return err('كلمتا السر غير متطابقتين');const s=rnd();users[U]={s,h:await pbk(a,s)};LS.s('dm_users',users);closeM();view()}
@@ -241,21 +253,25 @@ function dlist(L){if(!L.length)return '<p class="mut" style="text-align:center;m
  return `<div class="card"><div class="row"><b>${esc(d.person)}</b><span class="tag ${d.dir}">${d.dir=='in'?'لي عنده':'عليّ له'}</span></div>
  <div class="big">${fmt(r,d.cur)}</div><small>من أصل ${fmt(d.amt,d.cur)}${d.cur!=D.base?' ≈ '+fmt(conv(r,d.cur),D.base):''}</small>
  <div class="pg"><i style="width:${p}%"></i></div><small>${d.due?'الاستحقاق: '+d.due:''}${od?' <b class="r">متأخر</b>':''}${d.note?' · '+esc(d.note):''}</small>
- <div class="acts">${r?`<button onclick="payM('${d.id}')">＋ دفعة</button>`:'<span class="ok">مسددة ✓</span>'}<button onclick="hist('${d.id}')">السجل</button>${d.dir=='in'&&r?`<button onclick="wa('${d.id}')">📲 تذكير</button>`:''}<button onclick="debtM('${d.id}')">تعديل</button><button class="del" onclick="delD('${d.id}')">حذف</button></div></div>`}).join('')}
-function debtM(id){const d=id?D.debts.find(x=>x.id==id):{dir:'in',cur:D.base,date:today()};
+ <div class="acts">${r?`<button onclick="payM('${d.id}')">＋ دفعة</button>`:'<span class="ok">مسددة ✓</span>'}<button onclick="hist('${d.id}')">السجل</button>${d.sched?`<button onclick="schedM('${d.id}')">الأقساط</button>`:''}${d.dir=='in'&&r?`<button onclick="wa('${d.id}')">📲 تذكير</button>`:''}<button onclick="debtM('${d.id}')">تعديل</button><button class="del" onclick="delD('${d.id}')">حذف</button></div></div>`}).join('')}
+function debtM(id){const d=id?D.debts.find(x=>x.id==id):{dir:'in',cur:D.base,date:today()},lk=!!(id&&d.sched);
  modal(`<h3>${id?'تعديل دين':'دين جديد'}</h3><div class="seg"><label><input type="radio" name="dr" value="in" ${d.dir=='in'?'checked':''}>لي عند شخص</label><label><input type="radio" name="dr" value="out" ${d.dir=='out'?'checked':''}>عليّ لشخص</label></div>
  <label>الاسم<input id="f1" value="${esc(d.person||'')}" list="pl"></label><datalist id="pl">${[...new Set(D.debts.map(x=>x.person))].map(p=>`<option value="${esc(p)}">`).join('')}</datalist>
- <div class="two"><label>المبلغ<input id="f2" type="number" inputmode="decimal" step="any" value="${d.amt||''}"></label><label>العملة<select id="f3">${co(d.cur)}</select></label></div>
- <div class="two"><label>التاريخ<input id="f4" type="date" value="${d.date}"></label><label>الاستحقاق<input id="f5" type="date" value="${d.due||''}"></label></div>
+ <div class="two"><label>${lk?'إجمالي المبلغ':'المبلغ'}<input id="f2" type="number" inputmode="decimal" step="any" value="${d.amt||''}" ${lk?'disabled':''}></label><label>العملة<select id="f3" ${lk?'disabled':''}>${co(d.cur)}</select></label></div>
+ <div class="two"><label>التاريخ<input id="f4" type="date" value="${d.date}"></label><label>الاستحقاق<input id="f5" type="date" value="${d.due||''}" ${lk?'disabled':''}></label></div>
+ ${!id?`<label style="display:flex;gap:8px;align-items:center;margin-top:14px"><input type="checkbox" id="fi" style="width:auto;margin:0" onchange="$('#ib').style.display=this.checked?'grid':'none';$('#f5').disabled=this.checked">قسّط المبلغ على دفعات شهرية</label><div id="ib" class="two" style="display:none;margin-top:8px"><label>عدد الأقساط<input id="fn" type="number" min="2" max="120" value="12"></label><label>تاريخ أول قسط<input id="fs" type="date" value="${today()}"></label></div>`:''}
  <label>ملاحظة<input id="f6" value="${esc(d.note||'')}"></label><div class="err" id="er"></div><button class="pri" onclick="saveD('${id||''}')">حفظ</button>`)}
 function saveD(id){const p=$('#f1').value.trim(),a=parseFloat($('#f2').value);if(!p||!(a>0))return err('اكتب الاسم ومبلغاً صحيحاً');
- const o={dir:document.querySelector('[name=dr]:checked').value,person:p,amt:a,cur:$('#f3').value,date:$('#f4').value||today(),due:$('#f5').value,note:$('#f6').value.trim()};
- if(id)Object.assign(D.debts.find(x=>x.id==id),o);else D.debts.push({id:uid(),pays:[],...o});save();closeM();view()}
+ const old=id?D.debts.find(x=>x.id==id):null,inst=!id&&$('#fi')&&$('#fi').checked;
+ const o={dir:document.querySelector('[name=dr]:checked').value,person:p,amt:old&&old.sched?old.amt:a,cur:$('#f3').value,date:$('#f4').value||today(),due:$('#f5').value,note:$('#f6').value.trim()};
+ if(inst){const n=parseInt($('#fn').value),st=$('#fs').value;if(!(n>=2&&n<=120)||!st)return err('عدد الأقساط بين 2 و 120، واختر تاريخ أول قسط');o.sched=buildSched(a,n,st);o.due=o.sched[0].due}
+ if(old){Object.assign(old,o);syncDue(old)}else D.debts.push({id:uid(),pays:[],...o});save();closeM();view()}
+function schedM(id){const d=D.debts.find(x=>x.id==id),p=paid(d);let c=0;const rows=d.sched.map((x,i)=>{c+=x.amt;const ok=p>=c-1e-9,late=!ok&&x.due<today();return `<div class="row card" style="margin-top:8px"><span>${i+1}. ${x.due}<br><small>${fmt(x.amt,d.cur)}</small></span><span class="tag ${ok?'in':late?'out':''}">${ok?'مدفوع ✓':late?'متأخر':'قادم'}</span></div>`}).join('');modal(`<h3>أقساط ${esc(d.person)}</h3><p class="mut">${d.sched.length} قسط · الإجمالي ${fmt(d.amt,d.cur)}</p>${rows}`)}
 function payM(id){const d=D.debts.find(x=>x.id==id);modal(`<h3>دفعة لـ ${esc(d.person)}</h3><small>المتبقي ${fmt(rem(d),d.cur)}</small>
  <div class="two"><label>المبلغ<input id="f1" type="number" inputmode="decimal" step="any" value="${rem(d)}"></label><label>التاريخ<input id="f2" type="date" value="${today()}"></label></div><div class="err" id="er"></div><button class="pri" onclick="savePay('${id}')">تسجيل الدفعة</button>`)}
-function savePay(id){const d=D.debts.find(x=>x.id==id),a=parseFloat($('#f1').value);if(!(a>0)||a>rem(d)+1e-9)return err('المبلغ غير صحيح أو أكبر من المتبقي');d.pays.push({a,date:$('#f2').value||today()});save();closeM();view()}
+function savePay(id){const d=D.debts.find(x=>x.id==id),a=parseFloat($('#f1').value);if(!(a>0)||a>rem(d)+1e-9)return err('المبلغ غير صحيح أو أكبر من المتبقي');d.pays.push({a,date:$('#f2').value||today()});syncDue(d);save();closeM();view()}
 function hist(id){const d=D.debts.find(x=>x.id==id);modal(`<h3>سجل ${esc(d.person)}</h3><p class="mut">الدين الأصلي: ${fmt(d.amt,d.cur)} بتاريخ ${d.date}</p>${d.pays.length?d.pays.map((p,i)=>`<div class="row card" style="margin-top:8px"><span>${p.date} · <b>${fmt(p.a,d.cur)}</b></span><button class="del" onclick="delPay('${id}',${i})">حذف</button></div>`).join(''):'<p class="mut" style="margin-top:10px">لا توجد دفعات</p>'}`)}
-function delPay(id,i){D.debts.find(x=>x.id==id).pays.splice(i,1);save();hist(id);view()}
+function delPay(id,i){const d=D.debts.find(x=>x.id==id);d.pays.splice(i,1);syncDue(d);save();hist(id);view()}
 const delD=id=>ask('حذف هذا الدين نهائياً؟',()=>{D.debts=D.debts.filter(x=>x.id!=id);save();view()});
 
 /* ---------- المصاريف ---------- */
@@ -327,13 +343,13 @@ const _sets4=sets;sets=()=>pwCard()+_sets4();
 const APP={name:'GT-DAYN',ver:'1.0.0',support:'amirrafah100@gmail.com',wa:''};
 const LEGAL_DATE='27 نوفمبر 2026';
 const prof=()=>D.prof||{};
-const dispName=()=>prof().name||U.split('@')[0];
+const dispName=()=>prof().name||(users[U]&&users[U].un)||U.split('@')[0];
 function avatar(s=44){const p=prof(),st=`width:${s}px;height:${s}px;font-size:${Math.round(s*.4)}px`;return p.photo?`<img class="avi" src="${p.photo}" alt="" style="${st}">`:`<span class="avi" style="${st}">${esc((dispName()||'?').trim().charAt(0).toUpperCase())}</span>`}
 function onPhoto(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const S=256,c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d'),m=Math.min(im.width,im.height);x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,S,S);D.prof={...prof(),photo:c.toDataURL('image/jpeg',.85)};save();shell()};im.src=r.result};r.readAsDataURL(f);el.value=''}
 const delPhoto=()=>{const p={...prof()};delete p.photo;D.prof=p;save();shell()};
 function nameM(){modal(`<h3>اسمك في البرنامج</h3><label>الاسم<input id="f1" value="${esc(dispName())}" maxlength="30"></label><div class="err" id="er"></div><button class="pri" onclick="saveName()">حفظ</button>`)}
 function saveName(){const v=$('#f1').value.trim();if(!v)return err('اكتب اسماً');D.prof={...prof(),name:v};save();closeM();shell()}
-const profCard=()=>`<div class="card"><div class="row" style="justify-content:flex-start;gap:14px">${avatar(68)}<div style="min-width:0;flex:1"><b style="font-size:18px">${esc(dispName())}</b><br><small dir="ltr" style="word-break:break-all">${esc(U)}</small></div></div><div class="acts"><button onclick="document.getElementById('ph').click()">📷 تغيير الصورة</button><button onclick="nameM()">✏️ تعديل الاسم</button>${prof().photo?'<button class="del" onclick="delPhoto()">حذف الصورة</button>':''}</div><input type="file" id="ph" accept="image/*" style="display:none" onchange="onPhoto(this)"></div>`;
+const profCard=()=>`<div class="card"><div class="row" style="justify-content:flex-start;gap:14px">${avatar(68)}<div style="min-width:0;flex:1"><b style="font-size:18px">${esc(dispName())}</b><br><small dir="ltr" style="word-break:break-all">@${esc((users[U]||{}).un||'')} · ${esc(U)}</small></div></div><div class="acts"><button onclick="document.getElementById('ph').click()">📷 تغيير الصورة</button><button onclick="nameM()">✏️ تعديل الاسم</button><button onclick="unM()">@ اسم المستخدم</button>${prof().photo?'<button class="del" onclick="delPhoto()">حذف الصورة</button>':''}</div><input type="file" id="ph" accept="image/*" style="display:none" onchange="onPhoto(this)"></div>`;
 
 function pageM(title,items){modal(`<h3>${title}</h3><small>آخر تحديث: ${LEGAL_DATE}</small>${items.map(([t,x])=>`<p class="pt"><b>${t}</b><br>${x}</p>`).join('')}<p class="mut" style="margin-top:14px;font-size:12px">للاستفسار: ${esc(APP.support)}</p>`)}
 function privacyM(){pageM('سياسة الخصوصية',[
@@ -373,5 +389,64 @@ const _sets6=sets;sets=()=>profCard()+_sets6()+supportCard();
 const DEF_RATES={USD:1,EUR:1.08,GBP:1.27,SAR:.2667,AED:.2723,JOD:1.41,KWD:3.25,TRY:.029,EGP:.02};
 const resetRates=()=>ask('إرجاع الأسعار للقيم الافتراضية؟ العملات اللي أضفتها بتبقى كما هي.',()=>{const fb=DEF_RATES[D.base]||1;Object.keys(D.cur).forEach(k=>{if(DEF_RATES[k])D.cur[k].r=DEF_RATES[k]/fb});D.cur[D.base].r=1;save();view()});
 
-const s=LS.g('dm_sess','');if(s)enter(s);else authUI();
+/* ---------- واجهة الخطوات وقوة كلمة السر ---------- */
+function stepper(n){const L=['البريد','الرمز','الحساب'];return `<div class="steps">${L.map((t,i)=>`${i?'<span class="stl"></span>':''}<div class="stp ${i+1==n?'on':i+1<n?'done':''}"><b>${i+1<n?'✓':i+1}</b>${t}</div>`).join('')}</div>`}
+function pwStr(v){const sc=(v.length>=6)+(v.length>=10)+(/\d/.test(v)&&/\D/.test(v))+(/[^a-zA-Z0-9\u0600-\u06FF\s]/.test(v)?1:0);const w=$('#pwi'),t=$('#pwt');if(!w||!t)return;w.style.width=(sc*25)+'%';w.style.background=sc<=1?'#dc2626':sc==2?'#d97706':'#16a34a';t.textContent=v?(sc<=1?'كلمة السر ضعيفة':sc==2?'كلمة السر متوسطة':'كلمة السر قوية'):''}
+
+/* ---------- إكمال الإعداد واسم المستخدم ---------- */
+const takenUn=(un,email)=>Object.keys(users).some(k=>k!==email&&users[k].un===un);
+const unOk=v=>/^[a-z0-9_]{3,20}$/.test(v);
+function setupUI(mode){const nu=mode=='new';
+ $('#app').innerHTML=`<div class="lg"><div class="lc"><div class="logo">${ICON(76)}</div>${nu?stepper(3):''}<h1>${nu?'أكمل إعداد حسابك':'عيّن كلمة سر جديدة'}</h1><p class="sub">${nu?'اسم المستخدم وكلمة السر إلزاميين، وبتحتاجهم للدخول لاحقاً.':'اكتب كلمة سر جديدة لحسابك.'}</p>
+ ${nu?`<label>اسم المستخدم<input id="su" dir="ltr" autocomplete="username" autocapitalize="none" placeholder="ahmad_99"></label><p class="mut" style="font-size:12px;margin-top:4px">إنجليزي وأرقام و _ فقط، من 3 إلى 20 حرف.</p>`:''}
+ <label>كلمة السر<input id="sp" type="password" dir="ltr" autocomplete="new-password" oninput="pwStr(this.value)"><span class="pwm" style="display:block"><i id="pwi"></i></span><small id="pwt" class="mut"></small></label>
+ <label>أعد كتابة كلمة السر<input id="sp2" type="password" dir="ltr" autocomplete="new-password"></label>
+ <div class="err" id="er"></div><button class="pri" onclick="saveSetup('${mode}')">حفظ والدخول</button>
+ <div class="row" style="margin-top:6px"><button class="link" onclick="AU=AU0();authUI()">إلغاء والرجوع</button></div>
+ </div></div>`}
+async function saveSetup(mode){
+ const email=AU.email,p=$('#sp').value,p2=$('#sp2').value;
+ let un=(users[email]&&users[email].un)||'';
+ if(mode=='new'){un=($('#su').value||'').trim().toLowerCase();if(!unOk(un))return err('اسم المستخدم 3 إلى 20 حرف: إنجليزي وأرقام و _ فقط');if(takenUn(un,email))return err('اسم المستخدم محجوز، اختر غيره')}
+ if(p.length<6)return err('كلمة السر 6 أحرف على الأقل');
+ if(p!==p2)return err('كلمتا السر غير متطابقتين');
+ const s=rnd();users[email]={...(users[email]||{}),un,s,h:await pbk(p,s)};LS.s('dm_users',users);
+ enter(email);
+}
+function unM(){modal(`<h3>اسم المستخدم</h3><p class="mut" style="margin-bottom:6px">تستخدمه للدخول بدل البريد.</p><label>الاسم الجديد<input id="f1" dir="ltr" value="${esc((users[U]||{}).un||'')}"></label><div class="err" id="er"></div><button class="pri" onclick="saveUn()">حفظ</button>`)}
+function saveUn(){const v=($('#f1').value||'').trim().toLowerCase();if(!unOk(v))return err('3 إلى 20 حرف: إنجليزي وأرقام و _ فقط');if(takenUn(v,U))return err('الاسم محجوز، اختر غيره');users[U]={...(users[U]||{}),un:v};LS.s('dm_users',users);closeM();shell()}
+
+/* ---------- الأقساط والقفل والتذكيرات ---------- */
+const addDays=(s,n)=>{const[y,m,d]=s.split('-').map(Number);return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10)};
+const addMonths=(s,n)=>{const[y,m,d]=s.split('-').map(Number);const t=new Date(Date.UTC(y,m-1+n,1));const last=new Date(Date.UTC(t.getUTCFullYear(),t.getUTCMonth()+1,0)).getUTCDate();t.setUTCDate(Math.min(d,last));return t.toISOString().slice(0,10)};
+function buildSched(total,n,start){const base=Math.floor(total*100/n)/100,out=[];for(let i=0;i<n;i++)out.push({due:addMonths(start,i),amt:i<n-1?base:+(total-base*(n-1)).toFixed(2)});return out}
+function syncDue(d){if(!d.sched)return;const p=paid(d);let c=0;const nx=d.sched.find(x=>{c+=x.amt;return p<c-1e-9});d.due=nx?nx.due:''}
+function remindersModal(){const t=today(),wk=addDays(t,7);const L=D.debts.filter(d=>rem(d)>0&&d.due&&d.due<=wk).sort((a,b)=>a.due>b.due?1:-1);if(!L.length)return false;
+ const sec=(title,arr)=>arr.length?`<h2 style="font-size:15px">${title}</h2>${arr.map(d=>`<div class="card row"><div><b>${esc(d.person)}</b><br><small class="${d.due<t?'r':''}">${d.due}</small></div><b class="${d.dir=='in'?'g':'r'}">${fmt(rem(d),d.cur)}</b></div>`).join('')}`:'';
+ modal(`<h3>🔔 التذكيرات</h3><p class="mut">عندك ${L.length} دين يحتاج متابعة</p>${sec('متأخرة',L.filter(d=>d.due<t))}${sec('مستحقة اليوم',L.filter(d=>d.due==t))}${sec('خلال 7 أيام',L.filter(d=>d.due>t))}`);return true}
+function afterOpen(){setTimeout(()=>{const k='dm_rem_'+U;if(!LOCK.on&&LS.g(k,'')!==today()&&remindersModal())LS.s(k,today())},700)}
+
+const LOCK={on:false,last:Date.now(),fails:0,busy:false,hidAt:0};
+const PIDLE=5*60e3;
+let PADV='';
+function lockUI(msg){$('#app').innerHTML=`<div class="lg"><div class="lc" style="text-align:center"><div class="logo">${ICON(64)}</div><h1 style="font-size:20px">أدخل رمز PIN</h1><p class="sub" id="lmsg">${msg||'افتح التطبيق برمزك'}</p><div class="pdots">${[0,1,2,3].map(()=>'<i class="pd"></i>').join('')}</div><div class="pad">${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>k===''?'<span></span>':`<button onclick="padKey('${k}')">${k}</button>`).join('')}</div><button class="link" style="margin-top:14px" onclick="logoutFromLock()">نسيت الرمز؟ تسجيل خروج</button></div></div>`;updDots()}
+function updDots(){document.querySelectorAll('.pd').forEach((el,i)=>el.classList.toggle('on',i<PADV.length))}
+function padKey(k){if(LOCK.busy)return;if(k=='⌫')PADV=PADV.slice(0,-1);else if(PADV.length<4)PADV+=k;updDots();if(PADV.length==4)tryPin()}
+async function tryPin(){LOCK.busy=true;const h=await pbk(PADV,D.pinS);LOCK.busy=false;if(h===D.pinH)return unlock();PADV='';updDots();LOCK.fails++;if(LOCK.fails>=5){logoutFromLock();return}const m=$('#lmsg');if(m)m.textContent='الرمز غير صحيح، باقي '+(5-LOCK.fails)+' محاولات'}
+function unlock(){LOCK.on=false;LOCK.fails=0;LOCK.last=Date.now();PADV='';shell();afterOpen()}
+function autoLock(){if(!LOCK.on&&U&&D&&D.pinH){LOCK.on=true;PADV='';lockUI()}}
+function logoutFromLock(){LOCK.on=false;LOCK.fails=0;PADV='';logout()}
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{LOCK.last=Date.now()},{passive:true}));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)LOCK.hidAt=Date.now();else{if(LOCK.hidAt&&Date.now()-LOCK.hidAt>30e3)autoLock();LOCK.hidAt=0}});
+setInterval(()=>{if(Date.now()-LOCK.last>PIDLE)autoLock()},15e3);
+
+function pinM(){modal(`<h3>${D.pinH?'تغيير رمز PIN':'تفعيل رمز PIN'}</h3><p class="mut" style="margin-bottom:6px">4 أرقام، وبيُطلب منك كل ما فتحت التطبيق بعد قفل تلقائي.</p><label>الرمز الجديد<input id="f1" type="password" inputmode="numeric" maxlength="4" dir="ltr"></label><label>أعد كتابة الرمز<input id="f2" type="password" inputmode="numeric" maxlength="4" dir="ltr"></label><div class="err" id="er"></div><button class="pri" onclick="savePin()">حفظ</button>`)}
+async function savePin(){const a=$('#f1').value,b=$('#f2').value;if(!/^\d{4}$/.test(a))return err('الرمز لازم يكون 4 أرقام');if(a!==b)return err('الرمزان غير متطابقين');const s=rnd();D.pinS=s;D.pinH=await pbk(a,s);LOCK.last=Date.now();save();closeM();shell()}
+function pinOffM(){modal(`<h3>إزالة القفل</h3><label>أدخل الرمز الحالي<input id="f1" type="password" inputmode="numeric" maxlength="4" dir="ltr"></label><div class="err" id="er"></div><button class="pri" onclick="pinOff()">إزالة</button>`)}
+async function pinOff(){const h=await pbk($('#f1').value,D.pinS);if(h!==D.pinH)return err('الرمز غير صحيح');delete D.pinH;delete D.pinS;save();closeM();shell()}
+const pinCard=()=>`<div class="card"><b>🔐 قفل التطبيق</b><p class="mut" style="margin:4px 0 10px">${D.pinH?'مفعّل. يُقفل تلقائياً بعد 5 دقائق بدون استخدام، أو إذا خرجت من التطبيق أكثر من 30 ثانية.':'غير مفعّل. فعّله عشان تحمي بياناتك على الجهاز.'}</p><div class="acts"><button onclick="pinM()">${D.pinH?'تغيير الرمز':'تفعيل رمز PIN'}</button>${D.pinH?'<button class="del" onclick="pinOffM()">إزالة القفل</button>':''}</div></div>`;
+const _sets7=sets;sets=()=>_sets7().replace('<div class="card"><b>🔑 كلمة السر</b>',()=>pinCard()+'<div class="card"><b>🔑 كلمة السر</b>');
+
+const s=LS.g('dm_sess','');
+if(s){const sd=LS.g('dm_d_'+s,null);if(sd&&sd.pinH){U=s;D=sd;LOCK.on=true;lockUI()}else enter(s)}else authUI();
 </script></body></html>
